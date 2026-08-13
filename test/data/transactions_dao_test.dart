@@ -9,14 +9,12 @@ void main() {
   late AppDatabase db;
   late TransactionsDao dao;
   late int foodId;
-  late int salaryId;
 
   Future<void> seed() async {
     final catDao = CategoriesDao(db);
     await catDao.seedBuiltinCategories();
     final cats = await catDao.getByType(TxType.expense);
     foodId = cats.firstWhere((c) => c.name == '餐饮').id;
-    salaryId = (await catDao.getByType(TxType.income)).first.id;
   }
 
   setUp(() {

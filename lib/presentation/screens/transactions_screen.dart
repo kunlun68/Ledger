@@ -15,7 +15,6 @@ class TransactionsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final month = ref.watch(currentMonthProvider);
     final txs = ref.watch(monthTransactionsProvider).value ?? const <Transaction>[];
     final cats = ref.watch(allCategoriesProvider).value ?? const <Category>[];
     final dao = ref.read(transactionsDaoProvider);

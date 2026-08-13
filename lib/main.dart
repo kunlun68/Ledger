@@ -7,10 +7,24 @@ import 'data/database.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final db = AppDatabase.open();
-  await CategoriesDao(db).seedBuiltinCategories();
-  runApp(ProviderScope(
-    overrides: [databaseProvider.overrideWithValue(db)],
-    child: const LedgerApp(),
-  ));
+  try {
+    final db = AppDatabase.open();
+    await CategoriesDao(db).seedBuiltinCategories();
+    runApp(ProviderScope(
+      overrides: [databaseProvider.overrideWithValue(db)],
+      child: const LedgerApp(),
+    ));
+  } catch (e) {
+    // 数据库初始化失败时兜底：显示错误页而非崩溃白屏
+    runApp(MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Text('数据库初始化失败：$e'),
+          ),
+        ),
+      ),
+    ));
+  }
 }
