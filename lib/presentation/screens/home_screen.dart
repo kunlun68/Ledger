@@ -8,6 +8,7 @@ import '../../data/transaction_type.dart';
 import '../theme/app_theme.dart';
 import 'add_transaction_screen.dart';
 import 'categories_screen.dart';
+import 'statistics_screen.dart';
 import 'transactions_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -42,6 +43,11 @@ class HomeScreen extends ConsumerWidget {
           ],
         ),
         actions: [
+          IconButton(
+              icon: const Icon(Icons.pie_chart_outline),
+              tooltip: '统计',
+              onPressed: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const StatisticsScreen()))),
           IconButton(
               icon: const Icon(Icons.category_outlined),
               tooltip: '分类管理',

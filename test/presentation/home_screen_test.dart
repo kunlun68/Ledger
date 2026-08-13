@@ -10,6 +10,7 @@ import 'package:ledger/data/transaction_type.dart';
 import 'package:ledger/presentation/screens/add_transaction_screen.dart';
 import 'package:ledger/presentation/screens/categories_screen.dart';
 import 'package:ledger/presentation/screens/home_screen.dart';
+import 'package:ledger/presentation/screens/statistics_screen.dart';
 import 'package:ledger/presentation/screens/transactions_screen.dart';
 
 void main() {
@@ -102,5 +103,17 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('分类管理'), findsOneWidget);
     expect(find.byType(CategoriesScreen), findsOneWidget);
+  });
+
+  testWidgets('chart icon opens statistics screen', (tester) async {
+    final container = await makeContainer();
+    addTearDown(container.dispose);
+    await tester.pumpWidget(UncontrolledProviderScope(
+        container: container, child: const MaterialApp(home: HomeScreen())));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.pie_chart_outline));
+    await tester.pumpAndSettle();
+    expect(find.text('本月暂无支出记录'), findsOneWidget);
+    expect(find.byType(StatisticsScreen), findsOneWidget);
   });
 }
