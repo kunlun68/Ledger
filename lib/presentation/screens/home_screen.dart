@@ -7,6 +7,7 @@ import '../../data/database.dart';
 import '../../data/transaction_type.dart';
 import '../theme/app_theme.dart';
 import 'add_transaction_screen.dart';
+import 'transactions_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -57,6 +58,16 @@ class HomeScreen extends ConsumerWidget {
                       )),
                 ),
         ),
+        TextButton.icon(
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) =>
+                      TransactionsScreen(initialMonth: month, onExit: () => Navigator.pop(context))),
+            ),
+            icon: const Icon(Icons.list),
+            label: const Text('查看全部'),
+          ),
       ]),
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.push(

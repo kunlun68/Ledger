@@ -9,6 +9,7 @@ import 'package:ledger/data/database.dart';
 import 'package:ledger/data/transaction_type.dart';
 import 'package:ledger/presentation/screens/add_transaction_screen.dart';
 import 'package:ledger/presentation/screens/home_screen.dart';
+import 'package:ledger/presentation/screens/transactions_screen.dart';
 
 void main() {
   late AppDatabase db;
@@ -76,5 +77,17 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('编辑记录'), findsOneWidget);
     expect(find.text('12.34'), findsOneWidget); // 金额预填
+  });
+
+  testWidgets('view all opens transactions screen', (tester) async {
+    final container = await makeContainer();
+    addTearDown(container.dispose);
+    await tester.pumpWidget(UncontrolledProviderScope(
+        container: container, child: const MaterialApp(home: HomeScreen())));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('查看全部'));
+    await tester.pumpAndSettle();
+    expect(find.text('账单'), findsOneWidget);
+    expect(find.byType(TransactionsScreen), findsOneWidget);
   });
 }
