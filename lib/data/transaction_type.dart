@@ -1,0 +1,1 @@
+enum TxType { expense, income }
