@@ -1,0 +1,52 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:drift/native.dart';
+import 'package:ledger/application/providers.dart';
+import 'package:ledger/data/dao/categories_dao.dart';
+import 'package:ledger/data/dao/transactions_dao.dart';
+import 'package:ledger/data/database.dart';
+import 'package:ledger/data/transaction_type.dart';
+import 'package:ledger/presentation/screens/home_screen.dart';
+
+void main() {
+  late AppDatabase db;
+
+  setUp(() async {
+    db = AppDatabase.open(executor: NativeDatabase.memory());
+    await CategoriesDao(db).seedBuiltinCategories();
+  });
+  tearDown(() => db.close());
+
+  Future<ProviderContainer> makeContainer() async {
+    final container = ProviderContainer(overrides: [
+      databaseProvider.overrideWithValue(db),
+    ]);
+    container.read(currentMonthProvider.notifier).state = 202608;
+    return container;
+  }
+
+  testWidgets('empty state shows hint', (tester) async {
+    final container = await makeContainer();
+    addTearDown(container.dispose);
+    await tester.pumpWidget(UncontrolledProviderScope(
+        container: container, child: const MaterialApp(home: HomeScreen())));
+    await tester.pumpAndSettle();
+    expect(find.text('还没有记账记录'), findsOneWidget);
+    expect(find.text('0.00'), findsWidgets); // 支出/收入/结余
+  });
+
+  testWidgets('shows summary and recent transactions', (tester) async {
+    final cats = await CategoriesDao(db).getByType(TxType.expense);
+    await TransactionsDao(db)
+        .insertTransaction(TxType.expense, 1234, cats.first.id, 20260813, '午饭');
+    final container = await makeContainer();
+    addTearDown(container.dispose);
+    await tester.pumpWidget(UncontrolledProviderScope(
+        container: container, child: const MaterialApp(home: HomeScreen())));
+    await tester.pumpAndSettle();
+    expect(find.text('支出 12.34'), findsOneWidget); // 支出卡片
+    expect(find.text('-12.34'), findsNWidgets(2)); // 结余卡片 + 记录行
+    expect(find.text('午饭'), findsOneWidget);
+  });
+}
