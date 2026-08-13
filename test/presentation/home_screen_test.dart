@@ -8,6 +8,7 @@ import 'package:ledger/data/dao/transactions_dao.dart';
 import 'package:ledger/data/database.dart';
 import 'package:ledger/data/transaction_type.dart';
 import 'package:ledger/presentation/screens/add_transaction_screen.dart';
+import 'package:ledger/presentation/screens/categories_screen.dart';
 import 'package:ledger/presentation/screens/home_screen.dart';
 import 'package:ledger/presentation/screens/transactions_screen.dart';
 
@@ -89,5 +90,17 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('账单'), findsOneWidget);
     expect(find.byType(TransactionsScreen), findsOneWidget);
+  });
+
+  testWidgets('category icon opens categories screen', (tester) async {
+    final container = await makeContainer();
+    addTearDown(container.dispose);
+    await tester.pumpWidget(UncontrolledProviderScope(
+        container: container, child: const MaterialApp(home: HomeScreen())));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.category_outlined));
+    await tester.pumpAndSettle();
+    expect(find.text('分类管理'), findsOneWidget);
+    expect(find.byType(CategoriesScreen), findsOneWidget);
   });
 }

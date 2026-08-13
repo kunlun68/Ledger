@@ -7,6 +7,7 @@ import '../../data/database.dart';
 import '../../data/transaction_type.dart';
 import '../theme/app_theme.dart';
 import 'add_transaction_screen.dart';
+import 'categories_screen.dart';
 import 'transactions_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -40,6 +41,13 @@ class HomeScreen extends ConsumerWidget {
                 icon: const Icon(Icons.chevron_right)),
           ],
         ),
+        actions: [
+          IconButton(
+              icon: const Icon(Icons.category_outlined),
+              tooltip: '分类管理',
+              onPressed: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const CategoriesScreen()))),
+        ],
       ),
       body: Column(children: [
         _SummaryCard(summary: summary),
