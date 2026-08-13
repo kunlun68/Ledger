@@ -1,30 +1,28 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
+// App 启动 smoke test：验证 数据库 → ProviderScope → LedgerApp 完整链路。
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:ledger/main.dart';
+import 'package:drift/native.dart';
+import 'package:ledger/app.dart';
+import 'package:ledger/application/providers.dart';
+import 'package:ledger/data/dao/categories_dao.dart';
+import 'package:ledger/data/database.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('app launches and shows empty state', (tester) async {
+    final db = AppDatabase.open(executor: NativeDatabase.memory());
+    await CategoriesDao(db).seedBuiltinCategories();
+    addTearDown(db.close);
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    await tester.pumpWidget(ProviderScope(
+      overrides: [databaseProvider.overrideWithValue(db)],
+      child: const LedgerApp(),
+    ));
+    await tester.pumpAndSettle();
+    expect(find.text('还没有记账记录'), findsOneWidget);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // 卸载树取消 stream 订阅；推进时钟执行 drift 的清理 Timer（Duration.zero）
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump(Duration.zero);
   });
 }

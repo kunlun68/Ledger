@@ -7,6 +7,7 @@ import 'package:ledger/data/dao/categories_dao.dart';
 import 'package:ledger/data/dao/transactions_dao.dart';
 import 'package:ledger/data/database.dart';
 import 'package:ledger/data/transaction_type.dart';
+import 'package:ledger/presentation/screens/add_transaction_screen.dart';
 import 'package:ledger/presentation/screens/home_screen.dart';
 
 void main() {
@@ -48,5 +49,32 @@ void main() {
     expect(find.text('支出 12.34'), findsOneWidget); // 支出卡片
     expect(find.text('-12.34'), findsNWidgets(2)); // 结余卡片 + 记录行
     expect(find.text('午饭'), findsOneWidget);
+  });
+
+  testWidgets('FAB opens add transaction screen', (tester) async {
+    final container = await makeContainer();
+    addTearDown(container.dispose);
+    await tester.pumpWidget(UncontrolledProviderScope(
+        container: container, child: const MaterialApp(home: HomeScreen())));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(FloatingActionButton));
+    await tester.pumpAndSettle();
+    expect(find.text('记一笔'), findsOneWidget);
+    expect(find.byType(AddTransactionScreen), findsOneWidget);
+  });
+
+  testWidgets('tapping a transaction opens edit screen', (tester) async {
+    final cats = await CategoriesDao(db).getByType(TxType.expense);
+    await TransactionsDao(db)
+        .insertTransaction(TxType.expense, 1234, cats.first.id, 20260813, '午饭');
+    final container = await makeContainer();
+    addTearDown(container.dispose);
+    await tester.pumpWidget(UncontrolledProviderScope(
+        container: container, child: const MaterialApp(home: HomeScreen())));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('午饭'));
+    await tester.pumpAndSettle();
+    expect(find.text('编辑记录'), findsOneWidget);
+    expect(find.text('12.34'), findsOneWidget); // 金额预填
   });
 }

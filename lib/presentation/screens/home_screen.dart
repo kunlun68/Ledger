@@ -6,6 +6,7 @@ import '../../core/money.dart';
 import '../../data/database.dart';
 import '../../data/transaction_type.dart';
 import '../theme/app_theme.dart';
+import 'add_transaction_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -47,10 +48,23 @@ class HomeScreen extends ConsumerWidget {
               : ListView.builder(
                   itemCount: txs.length > 5 ? 5 : txs.length,
                   itemBuilder: (_, i) => _TransactionTile(
-                      tx: txs[i], categoryName: catName(txs[i].categoryId)),
+                      tx: txs[i],
+                      categoryName: catName(txs[i].categoryId),
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => AddTransactionScreen(initial: txs[i])),
+                      )),
                 ),
         ),
       ]),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const AddTransactionScreen()),
+        ),
+        child: const Icon(Icons.add),
+      ),
     );
   }
 
@@ -98,10 +112,12 @@ class _SummaryCard extends StatelessWidget {
 }
 
 class _TransactionTile extends StatelessWidget {
-  const _TransactionTile({required this.tx, required this.categoryName});
+  const _TransactionTile(
+      {required this.tx, required this.categoryName, required this.onTap});
 
   final Transaction tx;
   final String categoryName;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -116,7 +132,7 @@ class _TransactionTile extends StatelessWidget {
         '$sign${formatCents(tx.amountCents)}',
         style: TextStyle(color: color, fontWeight: FontWeight.w600, fontSize: 16),
       ),
-      onTap: () {}, // Task 9 接编辑
+      onTap: onTap,
     );
   }
 }
