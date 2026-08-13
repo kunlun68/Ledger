@@ -33,6 +33,9 @@ migrate_working_dir/
 /build/
 /coverage/
 
+# Local tool config (may contain permissions/tokens)
+/.claude/
+
 # Symbolication related
 app.*.symbols
 
