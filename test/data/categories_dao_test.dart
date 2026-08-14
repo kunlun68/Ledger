@@ -44,4 +44,15 @@ void main() {
     final updated = (await dao.getByType(TxType.expense)).firstWhere((c) => c.id == c.id);
     expect(updated.name, '猫粮2');
   });
+
+  test('updateBudget sets and clears monthly budget', () async {
+    await dao.seedBuiltinCategories();
+    final food = (await dao.getByType(TxType.expense)).first;
+    await dao.updateBudget(food.id, 15000);
+    var after = (await dao.getByType(TxType.expense)).first;
+    expect(after.monthlyBudgetCents, 15000);
+    await dao.updateBudget(food.id, 0); // 清除
+    after = (await dao.getByType(TxType.expense)).first;
+    expect(after.monthlyBudgetCents, 0);
+  });
 }

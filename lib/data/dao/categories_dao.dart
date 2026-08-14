@@ -62,6 +62,11 @@ class CategoriesDao {
             sortOrder: sortOrder ?? c.sortOrder,
           ));
 
+  /// 设置每月预算（分），0 = 清除预算。
+  Future<void> updateBudget(int categoryId, int monthlyBudgetCents) =>
+      (db.update(db.categories)..where((t) => t.id.equals(categoryId)))
+          .write(CategoriesCompanion(monthlyBudgetCents: Value(monthlyBudgetCents)));
+
   Future<void> deleteCategory(Category c) async {
     final used = await (db.select(db.transactions)
           ..where((t) => t.categoryId.equals(c.id)))
