@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'app.dart';
 import 'application/providers.dart';
+import 'core/date_util.dart';
 import 'data/dao/categories_dao.dart';
+import 'data/dao/recurring_dao.dart';
 import 'data/database.dart';
 
 Future<void> main() async {
@@ -10,6 +12,7 @@ Future<void> main() async {
   try {
     final db = AppDatabase.open();
     await CategoriesDao(db).seedBuiltinCategories();
+    await RecurringDao(db).generateDue(yyyymmOf(todayYyyymmdd()));
     runApp(ProviderScope(
       overrides: [databaseProvider.overrideWithValue(db)],
       child: const LedgerApp(),

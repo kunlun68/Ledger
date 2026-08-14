@@ -3,6 +3,7 @@ import '../core/date_util.dart';
 import '../core/stats.dart';
 import '../data/dao/backup_dao.dart';
 import '../data/dao/categories_dao.dart';
+import '../data/dao/recurring_dao.dart';
 import '../data/dao/transactions_dao.dart';
 import '../data/database.dart';
 import '../data/transaction_type.dart';
@@ -51,3 +52,7 @@ final categoryExpenseProvider = Provider<Map<int, int>>((ref) {
 
 final backupDaoProvider = Provider((ref) => BackupDao(ref.watch(databaseProvider)));
 final backupIOProvider = Provider<BackupIO>((ref) => SharePlusBackupIO());
+
+final recurringDaoProvider = Provider((ref) => RecurringDao(ref.watch(databaseProvider)));
+final recurringRulesProvider = StreamProvider<List<RecurringRule>>(
+    (ref) => ref.watch(recurringDaoProvider).watchAll());
