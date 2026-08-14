@@ -22,35 +22,49 @@ void main() {
         isBuiltin: true,
         monthlyBudgetCents: 0),
   ];
+  final accounts = [
+    Account(id: 1, name: '现金', icon: 'payments', sortOrder: 0, createdAt: DateTime(2026)),
+    Account(id: 2, name: '微信', icon: 'wechat', sortOrder: 1, createdAt: DateTime(2026)),
+  ];
 
-  Transaction tx(int id, TxType type, int cents, int categoryId, String note) => Transaction(
-      id: id,
-      type: type,
-      amountCents: cents,
-      categoryId: categoryId,
-      note: note,
-      date: 20260813,
-      accountId: 1,
-      transferAccountId: null,
-      createdAt: DateTime(2026, 8, 13),
-      updatedAt: DateTime(2026, 8, 13));
+  Transaction tx(int id, TxType type, int cents, int categoryId, String note,
+          {int account = 1, int? to}) =>
+      Transaction(
+          id: id,
+          type: type,
+          amountCents: cents,
+          categoryId: type == TxType.transfer ? null : categoryId,
+          note: note,
+          date: 20260813,
+          accountId: account,
+          transferAccountId: to,
+          createdAt: DateTime(2026, 8, 13),
+          updatedAt: DateTime(2026, 8, 13));
 
   test('starts with UTF-8 BOM and header', () {
-    final csv = buildCsv([], cats);
+    final csv = buildCsv([], cats, accounts);
     expect(csv.startsWith('﻿'), isTrue);
-    expect(csv.contains('date,type,category,amount,note'), isTrue);
+    expect(csv.contains('date,type,category,account,amount,note'), isTrue);
   });
 
-  test('formats rows: date, chinese type, category name, amount, note', () {
+  test('formats rows: date, chinese type, category name, account, amount, note', () {
     final csv = buildCsv(
-        [tx(1, TxType.expense, 1234, 1, '午饭'), tx(2, TxType.income, 500000, 2, '')], cats);
+        [tx(1, TxType.expense, 1234, 1, '午饭'), tx(2, TxType.income, 500000, 2, '')],
+        cats,
+        accounts);
     final lines = csv.split('\r\n');
-    expect(lines[1], '2026-08-13,支出,餐饮,12.34,午饭');
-    expect(lines[2], '2026-08-13,收入,工资,5000.00,');
+    expect(lines[1], '2026-08-13,支出,餐饮,现金,12.34,午饭');
+    expect(lines[2], '2026-08-13,收入,工资,现金,5000.00,');
+  });
+
+  test('transfer row: type 转账, empty category, both accounts', () {
+    final csv = buildCsv(
+        [tx(3, TxType.transfer, 1000, 1, '', account: 1, to: 2)], cats, accounts);
+    expect(csv.split('\r\n')[1], '2026-08-13,转账,,现金,10.00,');
   });
 
   test('unknown categoryId shows 未分类', () {
-    final csv = buildCsv([tx(1, TxType.expense, 100, 999, '')], cats);
+    final csv = buildCsv([tx(1, TxType.expense, 100, 999, '')], cats, accounts);
     expect(csv.split('\r\n')[1], contains('未分类'));
   });
 

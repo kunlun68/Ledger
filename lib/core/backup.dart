@@ -44,6 +44,8 @@ String encodeBackup(List<Category> cats, List<Transaction> txs) => jsonEncode({
             'categoryId': t.categoryId,
             'note': t.note,
             'date': t.date,
+            'accountId': t.accountId,
+            'transferAccountId': t.transferAccountId,
             'createdAt': t.createdAt.toIso8601String(),
             'updatedAt': t.updatedAt.toIso8601String(),
           }

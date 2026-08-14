@@ -19,7 +19,7 @@ Transaction _tx({int id = 1}) => Transaction(
     categoryId: 1,
     note: '午饭',
     date: 20260813,
-    accountId: 1,
+    accountId: 2,
     transferAccountId: null,
     createdAt: DateTime(2026, 8, 13, 12),
     updatedAt: DateTime(2026, 8, 13, 12));
@@ -38,7 +38,18 @@ void main() {
     expect(parsed.transactions.single.note, '午饭');
     expect(parsed.transactions.single.date, 20260813);
     expect(parsed.transactions.single.type, TxType.expense);
+    expect(parsed.transactions.single.accountId, 2);
+    expect(parsed.transactions.single.transferAccountId, isNull);
     expect(parsed.transactions.single.createdAt, DateTime(2026, 8, 13, 12));
+  });
+
+  test('parses legacy backup without account fields as account 1', () {
+    final legacy = '{"app":"ledger","version":1,"categories":[],"transactions":['
+        '{"id":1,"type":"expense","amountCents":100,"categoryId":1,"note":"","date":20260801,'
+        '"createdAt":"2026-08-01T00:00:00.000","updatedAt":"2026-08-01T00:00:00.000"}]}';
+    final parsed = parseBackup(legacy);
+    expect(parsed.transactions.single.accountId, 1);
+    expect(parsed.transactions.single.transferAccountId, isNull);
   });
 
   test('parses legacy backup without monthlyBudgetCents as 0', () {

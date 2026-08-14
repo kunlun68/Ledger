@@ -34,7 +34,8 @@ class SettingsScreen extends ConsumerWidget {
 
     Future<void> exportCsv() async {
       final all = await dao.exportAll();
-      await share('ledger-${todayYyyymmdd()}.csv', buildCsv(all.transactions, all.categories));
+      await share('ledger-${todayYyyymmdd()}.csv',
+          buildCsv(all.transactions, all.categories, all.accounts));
     }
 
     Future<void> exportBackup() async {

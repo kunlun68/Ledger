@@ -6,14 +6,18 @@ class BackupDao {
   BackupDao(this.db);
   final AppDatabase db;
 
-  Future<({List<Category> categories, List<Transaction> transactions})> exportAll() async {
+  Future<({List<Category> categories, List<Transaction> transactions, List<Account> accounts})>
+      exportAll() async {
     final categories = await (db.select(db.categories)
           ..orderBy([(t) => OrderingTerm.asc(t.sortOrder), (t) => OrderingTerm.asc(t.id)]))
         .get();
     final transactions = await (db.select(db.transactions)
           ..orderBy([(t) => OrderingTerm.desc(t.date), (t) => OrderingTerm.desc(t.id)]))
         .get();
-    return (categories: categories, transactions: transactions);
+    final accounts = await (db.select(db.accounts)
+          ..orderBy([(t) => OrderingTerm.asc(t.sortOrder), (t) => OrderingTerm.asc(t.id)]))
+        .get();
+    return (categories: categories, transactions: transactions, accounts: accounts);
   }
 
   /// 全量替换：单事务，任一步失败整体回滚。保留备份中的原始 id。
