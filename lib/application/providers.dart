@@ -1,10 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/date_util.dart';
 import '../core/stats.dart';
+import '../data/dao/backup_dao.dart';
 import '../data/dao/categories_dao.dart';
 import '../data/dao/transactions_dao.dart';
 import '../data/database.dart';
 import '../data/transaction_type.dart';
+import 'backup_io.dart';
 
 /// 在 main() 中 override 为真实数据库
 final databaseProvider = Provider<AppDatabase>((ref) => throw UnimplementedError());
@@ -46,3 +48,6 @@ final categoryExpenseProvider = Provider<Map<int, int>>((ref) {
   final txs = ref.watch(monthTransactionsProvider).value ?? const <Transaction>[];
   return expenseByCategory(txs);
 });
+
+final backupDaoProvider = Provider((ref) => BackupDao(ref.watch(databaseProvider)));
+final backupIOProvider = Provider<BackupIO>((ref) => SharePlusBackupIO());
