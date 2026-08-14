@@ -51,6 +51,10 @@ class _TransferScreenState extends ConsumerState<TransferScreen> {
       _show('请输入有效金额');
       return;
     }
+    if (_toId < 0) {
+      _show('至少需要两个账户才能转账');
+      return;
+    }
     if (_fromId == _toId) {
       _show('转出与转入账户不能相同');
       return;

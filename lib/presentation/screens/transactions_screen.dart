@@ -93,8 +93,11 @@ class TransactionsScreen extends ConsumerWidget {
                                       : null,
                               fontWeight: FontWeight.w600),
                         ),
-                        onTap: () => Navigator.push(context, MaterialPageRoute(
-                            builder: (_) => AddTransactionScreen(initial: tx))),
+                        // 转账记录不可编辑（记一笔表单只支持支出/收入）
+                        onTap: tx.type == TxType.transfer
+                            ? null
+                            : () => Navigator.push(context, MaterialPageRoute(
+                                builder: (_) => AddTransactionScreen(initial: tx))),
                       ),
                     ),
                 ],

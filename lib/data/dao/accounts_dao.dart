@@ -17,6 +17,11 @@ class AccountsDao {
           ..where((t) => t.accountId.equals(a.id) | t.transferAccountId.equals(a.id)))
         .get();
     if (used.isNotEmpty) throw AccountInUseException();
+    // 周期规则也引用账户（生成交易时写入），一并保护
+    final rules = await (db.select(db.recurringRules)
+          ..where((t) => t.accountId.equals(a.id)))
+        .get();
+    if (rules.isNotEmpty) throw AccountInUseException();
     await (db.delete(db.accounts)..where((t) => t.id.equals(a.id))).go();
   }
 

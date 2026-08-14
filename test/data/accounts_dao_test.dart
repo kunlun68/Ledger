@@ -3,6 +3,7 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:ledger/data/dao/accounts_dao.dart';
 import 'package:ledger/data/dao/categories_dao.dart';
+import 'package:ledger/data/dao/recurring_dao.dart';
 import 'package:ledger/data/dao/transactions_dao.dart';
 import 'package:ledger/data/database.dart';
 import 'package:ledger/data/transaction_type.dart';
@@ -52,5 +53,20 @@ void main() {
     final wx = (await db.select(db.accounts).get()).firstWhere((a) => a.name == '微信');
     await dao.deleteAccount(wx);
     expect((await db.select(db.accounts).get()).map((a) => a.name), ['现金']);
+  });
+
+  test('deleteAccount throws when account has recurring rules', () async {
+    await CategoriesDao(db).seedBuiltinCategories();
+    final food = (await CategoriesDao(db).getByType(TxType.expense)).first.id;
+    await RecurringDao(db).insertRule(
+        type: TxType.expense,
+        amountCents: 100,
+        categoryId: food,
+        dayOfMonth: 1,
+        note: '',
+        accountId: 1,
+        lastGeneratedYyyymm: 202608);
+    final cash = (await db.select(db.accounts).get()).single;
+    expect(() => dao.deleteAccount(cash), throwsA(isA<AccountInUseException>()));
   });
 }

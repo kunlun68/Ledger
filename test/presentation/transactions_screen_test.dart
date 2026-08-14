@@ -8,6 +8,7 @@ import 'package:ledger/data/dao/categories_dao.dart';
 import 'package:ledger/data/dao/transactions_dao.dart';
 import 'package:ledger/data/database.dart';
 import 'package:ledger/data/transaction_type.dart';
+import 'package:ledger/presentation/screens/add_transaction_screen.dart';
 import 'package:ledger/presentation/screens/transactions_screen.dart';
 
 void main() {
@@ -72,6 +73,18 @@ void main() {
     await pump(tester);
     expect(find.textContaining('现金 → 微信'), findsOneWidget);
     expect(find.byIcon(Icons.swap_horiz), findsOneWidget);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump(Duration.zero);
+  });
+
+  testWidgets('transfer tile is not editable (no navigation to form)', (tester) async {
+    await TransactionsDao(db).insertTransfer(
+        fromAccountId: 1, toAccountId: 2, amountCents: 500, date: 20260813);
+    await pump(tester);
+    await tester.tap(find.textContaining('现金 → 微信'));
+    await tester.pumpAndSettle();
+    // 记一笔表单只支持支出/收入，转账不可编辑 → 不应导航
+    expect(find.byType(AddTransactionScreen), findsNothing);
     await tester.pumpWidget(const SizedBox());
     await tester.pump(Duration.zero);
   });

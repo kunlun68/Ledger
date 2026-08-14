@@ -86,11 +86,14 @@ class HomeScreen extends ConsumerWidget {
                   itemBuilder: (_, i) => _TransactionTile(
                       tx: txs[i],
                       categoryName: catName(txs[i].categoryId),
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => AddTransactionScreen(initial: txs[i])),
-                      )),
+                      // 转账记录不可编辑（记一笔表单只支持支出/收入）
+                      onTap: txs[i].type == TxType.transfer
+                          ? null
+                          : () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => AddTransactionScreen(initial: txs[i])),
+                              )),
                 ),
         ),
         TextButton.icon(
@@ -163,7 +166,7 @@ class _TransactionTile extends StatelessWidget {
 
   final Transaction tx;
   final String categoryName;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
