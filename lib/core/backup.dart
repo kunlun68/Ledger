@@ -32,6 +32,7 @@ String encodeBackup(List<Category> cats, List<Transaction> txs) => jsonEncode({
             'type': c.type.name,
             'sortOrder': c.sortOrder,
             'isBuiltin': c.isBuiltin,
+            'monthlyBudgetCents': c.monthlyBudgetCents,
           }
       ],
       'transactions': [
@@ -87,6 +88,8 @@ Category _parseCategory(Object? raw) {
     type: TxType.values.byName(m['type'] as String),
     sortOrder: m['sortOrder'] as int,
     isBuiltin: m['isBuiltin'] as bool,
+    // 旧版备份（v1）无此字段，默认 0
+    monthlyBudgetCents: m['monthlyBudgetCents'] as int? ?? 0,
   );
 }
 

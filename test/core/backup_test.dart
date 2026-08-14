@@ -3,13 +3,14 @@ import 'package:ledger/core/backup.dart';
 import 'package:ledger/data/database.dart';
 import 'package:ledger/data/transaction_type.dart';
 
-Category _cat({int id = 1, String name = '餐饮'}) => Category(
+Category _cat({int id = 1, String name = '餐饮', int budget = 0}) => Category(
     id: id,
     name: name,
     icon: 'restaurant',
     type: TxType.expense,
     sortOrder: 0,
-    isBuiltin: true);
+    isBuiltin: true,
+    monthlyBudgetCents: budget);
 
 Transaction _tx({int id = 1}) => Transaction(
     id: id,
@@ -23,11 +24,12 @@ Transaction _tx({int id = 1}) => Transaction(
 
 void main() {
   test('encode and parse roundtrip preserves all fields', () {
-    final parsed = parseBackup(encodeBackup([_cat()], [_tx()]));
+    final parsed = parseBackup(encodeBackup([_cat(budget: 15000)], [_tx()]));
     expect(parsed.categories.single.id, 1);
     expect(parsed.categories.single.name, '餐饮');
     expect(parsed.categories.single.type, TxType.expense);
     expect(parsed.categories.single.isBuiltin, true);
+    expect(parsed.categories.single.monthlyBudgetCents, 15000);
     expect(parsed.transactions.single.id, 1);
     expect(parsed.transactions.single.amountCents, 1234);
     expect(parsed.transactions.single.categoryId, 1);
@@ -35,6 +37,14 @@ void main() {
     expect(parsed.transactions.single.date, 20260813);
     expect(parsed.transactions.single.type, TxType.expense);
     expect(parsed.transactions.single.createdAt, DateTime(2026, 8, 13, 12));
+  });
+
+  test('parses legacy backup without monthlyBudgetCents as 0', () {
+    final legacy = '{"app":"ledger","version":1,"categories":['
+        '{"id":1,"name":"餐饮","icon":"restaurant","type":"expense","sortOrder":0,"isBuiltin":true}],'
+        '"transactions":[]}';
+    final parsed = parseBackup(legacy);
+    expect(parsed.categories.single.monthlyBudgetCents, 0);
   });
 
   test('rejects non-ledger file', () {

@@ -11,14 +11,16 @@ void main() {
         icon: 'restaurant',
         type: TxType.expense,
         sortOrder: 0,
-        isBuiltin: true),
+        isBuiltin: true,
+        monthlyBudgetCents: 0),
     Category(
         id: 2,
         name: '工资',
         icon: 'payments',
         type: TxType.income,
         sortOrder: 0,
-        isBuiltin: true),
+        isBuiltin: true,
+        monthlyBudgetCents: 0),
   ];
 
   Transaction tx(int id, TxType type, int cents, int categoryId, String note) => Transaction(
