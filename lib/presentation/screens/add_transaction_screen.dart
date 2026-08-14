@@ -8,6 +8,7 @@ import '../../data/transaction_type.dart';
 import '../widgets/account_picker.dart';
 import '../widgets/amount_field.dart';
 import '../widgets/category_picker.dart';
+import '../widgets/app_scaffold.dart';
 
 /// 记一笔 / 编辑记录。传入 [initial] 时为编辑模式。
 class AddTransactionScreen extends ConsumerStatefulWidget {
@@ -111,7 +112,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   Widget build(BuildContext context) {
     _autoSelectCategory(ref.watch(allCategoriesProvider).value);
     _autoSelectAccount(ref.watch(allAccountsProvider).value);
-    return Scaffold(
+    return AppScaffold(
       appBar: AppBar(title: Text(widget.initial == null ? '记一笔' : '编辑记录')),
       body: SafeArea(
         child: Column(children: [

@@ -7,6 +7,7 @@ import '../../data/dao/accounts_dao.dart';
 import '../../data/database.dart';
 import '../theme/app_theme.dart';
 import 'transfer_screen.dart';
+import '../widgets/app_scaffold.dart';
 
 /// 账户列表：余额展示、新增、删除（有记录不可删）、转账入口。
 class AccountsScreen extends ConsumerWidget {
@@ -56,7 +57,7 @@ class AccountsScreen extends ConsumerWidget {
       }
     }
 
-    return Scaffold(
+    return AppScaffold(
       appBar: AppBar(
         title: const Text('账户'),
         actions: [

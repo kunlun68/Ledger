@@ -7,6 +7,7 @@ import '../../data/database.dart';
 import '../../data/transaction_type.dart';
 import '../widgets/amount_field.dart' show AmountInputFormatter;
 import '../widgets/category_picker.dart' show categoryIcons;
+import '../widgets/app_scaffold.dart';
 
 /// 分类管理：支出/收入两个 Tab；新增分类跟随当前 Tab 类型；
 /// 内置分类不可删除；被记录使用的分类删除时提示。
@@ -111,7 +112,7 @@ class _CategoriesScreenState extends ConsumerState<CategoriesScreen>
   @override
   Widget build(BuildContext context) {
     final cats = ref.watch(allCategoriesProvider).value ?? const <Category>[];
-    return Scaffold(
+    return AppScaffold(
       appBar: AppBar(
         title: const Text('分类管理'),
         bottom: TabBar(

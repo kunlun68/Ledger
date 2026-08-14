@@ -6,6 +6,7 @@ import '../../core/money.dart';
 import '../../data/database.dart';
 import '../widgets/account_picker.dart';
 import '../widgets/amount_field.dart';
+import '../widgets/app_scaffold.dart';
 
 /// 账户间转账：从账户 → 到账户。
 class TransferScreen extends ConsumerStatefulWidget {
@@ -71,7 +72,7 @@ class _TransferScreenState extends ConsumerState<TransferScreen> {
   @override
   Widget build(BuildContext context) {
     _autoSelect(ref.watch(allAccountsProvider).value);
-    return Scaffold(
+    return AppScaffold(
       appBar: AppBar(title: const Text('转账')),
       body: SafeArea(
         child: Column(children: [

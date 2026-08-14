@@ -7,6 +7,7 @@ import '../../core/csv_export.dart';
 import '../../core/date_util.dart';
 import 'accounts_screen.dart';
 import 'recurring_screen.dart';
+import '../widgets/app_scaffold.dart';
 
 /// 设置页：导出 CSV / 备份 / 恢复。
 class SettingsScreen extends ConsumerWidget {
@@ -78,7 +79,7 @@ class SettingsScreen extends ConsumerWidget {
       show('已恢复 ${data.transactions.length} 条交易、${data.categories.length} 个分类');
     }
 
-    return Scaffold(
+    return AppScaffold(
       appBar: AppBar(title: const Text('设置')),
       body: ListView(children: [
         ListTile(

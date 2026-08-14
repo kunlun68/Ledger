@@ -11,6 +11,7 @@ import '../theme/app_theme.dart';
 import '../widgets/account_picker.dart';
 import '../widgets/amount_field.dart' show AmountInputFormatter;
 import '../widgets/category_picker.dart';
+import '../widgets/app_scaffold.dart';
 
 /// 周期规则列表：新增/删除规则，规则生成的记录由启动时 generateDue 补齐。
 class RecurringScreen extends ConsumerWidget {
@@ -171,7 +172,7 @@ class RecurringScreen extends ConsumerWidget {
       }
     }
 
-    return Scaffold(
+    return AppScaffold(
       appBar: AppBar(title: const Text('周期记账')),
       floatingActionButton:
           FloatingActionButton(onPressed: addDialog, child: const Icon(Icons.add)),

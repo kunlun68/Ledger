@@ -6,6 +6,7 @@ import '../../data/database.dart';
 import '../../data/transaction_type.dart';
 import '../theme/app_theme.dart';
 import 'add_transaction_screen.dart';
+import '../widgets/app_scaffold.dart';
 
 /// 账单列表：按月内分组（日期间隔标题），滑动删除 + 撤销，点击进编辑。
 /// 显示月份由 [currentMonthProvider] 决定（与首页共享）。
@@ -46,7 +47,7 @@ class TransactionsScreen extends ConsumerWidget {
       ));
     }
 
-    return Scaffold(
+    return AppScaffold(
       appBar: AppBar(
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: onExit),
         title: Text('账单'),

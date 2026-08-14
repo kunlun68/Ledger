@@ -8,6 +8,7 @@ import '../../core/money.dart';
 import '../../core/stats.dart';
 import '../../data/database.dart';
 import '../theme/app_theme.dart';
+import '../widgets/app_scaffold.dart';
 
 /// 分类色板：饼图/柱状图共用，按 index 轮换
 const pieColors = <Color>[
@@ -37,7 +38,7 @@ class StatisticsScreen extends ConsumerWidget {
     final ranking = byCategory.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
 
-    return Scaffold(
+    return AppScaffold(
       appBar: AppBar(title: Text('统计 · ${formatYyyymm(month)}')),
       body: ListView(
         padding: const EdgeInsets.all(12),

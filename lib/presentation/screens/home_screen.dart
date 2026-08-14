@@ -12,6 +12,7 @@ import 'categories_screen.dart';
 import 'settings_screen.dart';
 import 'statistics_screen.dart';
 import 'transactions_screen.dart';
+import '../widgets/app_scaffold.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -28,7 +29,7 @@ class HomeScreen extends ConsumerWidget {
         ? '未分类'
         : cats.where((c) => c.id == id).map((c) => c.name).firstOrNull ?? '未分类';
 
-    return Scaffold(
+    return AppScaffold(
       appBar: AppBar(
         centerTitle: true,
         title: Row(
