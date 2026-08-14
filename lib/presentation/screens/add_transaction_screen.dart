@@ -84,6 +84,26 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     if (mounted) Navigator.pop(context);
   }
 
+  /// 编辑模式下删除当前记录（带确认）。
+  Future<void> _delete() async {
+    final t = widget.initial;
+    if (t == null) return;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('删除记录'),
+        content: const Text('删除后不可恢复'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('取消')),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('删除')),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    await ref.read(transactionsDaoProvider).deleteTransaction(t.id);
+    if (mounted) Navigator.pop(context);
+  }
+
   void _show(String msg) =>
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
 
@@ -136,6 +156,18 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             ),
           ),
           const Spacer(),
+          if (widget.initial != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: OutlinedButton(
+                onPressed: _delete,
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(48),
+                  foregroundColor: Theme.of(context).colorScheme.error,
+                ),
+                child: const Text('删除'),
+              ),
+            ),
           Padding(
             padding: const EdgeInsets.all(16),
             child: FilledButton(
