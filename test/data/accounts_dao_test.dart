@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:ledger/data/dao/accounts_dao.dart';
 import 'package:ledger/data/dao/categories_dao.dart';
@@ -14,7 +15,7 @@ void main() {
     db = AppDatabase.open(executor: NativeDatabase.memory());
     dao = AccountsDao(db);
     await db.into(db.accounts).insert(
-        const AccountsCompanion.insert(name: '现金', icon: 'payments', sortOrder: Value(0)));
+        AccountsCompanion.insert(name: '现金', icon: 'payments', sortOrder: const Value(0)));
   });
   tearDown(() => db.close());
 
