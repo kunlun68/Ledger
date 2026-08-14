@@ -73,7 +73,7 @@ class TransactionsScreen extends ConsumerWidget {
                         background: Container(
                           decoration: BoxDecoration(
                             color: AppTheme.expenseColor,
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(16),
                           ),
                           alignment: Alignment.centerRight,
                           padding: const EdgeInsets.only(right: 20),

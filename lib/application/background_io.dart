@@ -19,7 +19,12 @@ class PrefsSettingsStore implements SettingsStore {
   Future<BackgroundSettings?> readBackground() async {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString(_key);
-    return raw == null ? null : BackgroundSettings.fromJson(jsonDecode(raw));
+    if (raw == null) return null;
+    try {
+      return BackgroundSettings.fromJson(jsonDecode(raw));
+    } catch (_) {
+      return null; // 损坏 JSON 回退默认，不毒化 single-flight 加载
+    }
   }
 
   @override

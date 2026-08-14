@@ -23,13 +23,20 @@ class BackgroundSettings {
 
   double get clampedOpacity => imageOpacity.clamp(0.0, 1.0);
 
+  /// 哨兵：区分「未传参保留原值」与「显式传 null 清空」。
+  static const _unset = Object();
+
   BackgroundSettings copyWith(
-          {BackgroundType? type, int? colorValue, double? imageOpacity, String? imagePath}) =>
+          {BackgroundType? type,
+          int? colorValue,
+          double? imageOpacity,
+          Object? imagePath = _unset}) =>
       BackgroundSettings(
         type: type ?? this.type,
         colorValue: colorValue ?? this.colorValue,
         imageOpacity: imageOpacity ?? this.imageOpacity,
-        imagePath: imagePath ?? this.imagePath,
+        imagePath:
+            identical(imagePath, _unset) ? this.imagePath : imagePath as String?,
       );
 
   Map<String, Object?> toJson() => {
