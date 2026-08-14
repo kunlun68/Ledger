@@ -7,6 +7,7 @@ import '../../core/money.dart';
 import '../../data/database.dart';
 import '../../data/transaction_type.dart';
 import '../theme/app_theme.dart';
+import '../widgets/account_picker.dart';
 import '../widgets/amount_field.dart' show AmountInputFormatter;
 import '../widgets/category_picker.dart';
 
@@ -18,10 +19,13 @@ class RecurringScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final rules = ref.watch(recurringRulesProvider).value ?? const <RecurringRule>[];
     final cats = ref.watch(allCategoriesProvider).value ?? const <Category>[];
+    final accounts = ref.watch(allAccountsProvider).value ?? const <Account>[];
     final dao = ref.watch(recurringDaoProvider);
 
     String catName(int id) =>
         cats.where((c) => c.id == id).map((c) => c.name).firstOrNull ?? '未分类';
+    String accountName(int id) =>
+        accounts.where((a) => a.id == id).map((a) => a.name).firstOrNull ?? '未知账户';
 
     Future<void> addDialog() async {
       final amountCtrl = TextEditingController();
@@ -29,20 +33,28 @@ class RecurringScreen extends ConsumerWidget {
       final noteCtrl = TextEditingController();
       var type = TxType.expense;
       var categoryId = -1;
+      var accountId = -1;
 
-      // 同步兜底自动选中第一个匹配分类（与 AddTransactionScreen 同模式）
+      // 同步兜底自动选中第一个匹配分类/账户（与 AddTransactionScreen 同模式）
       void autoSelect() {
         if (categoryId >= 0) return;
         final first = cats.where((c) => c.type == type).firstOrNull;
         if (first != null) categoryId = first.id;
       }
 
+      void autoSelectAccount() {
+        if (accountId >= 0 || accounts.isEmpty) return;
+        accountId = accounts.first.id;
+      }
+
       autoSelect();
+      autoSelectAccount();
       await showDialog<void>(
         context: context,
         builder: (ctx) => StatefulBuilder(
           builder: (ctx, setDialogState) {
             autoSelect();
+            autoSelectAccount();
             return AlertDialog(
               title: const Text('新增周期规则'),
               content: SizedBox(
@@ -72,6 +84,9 @@ class RecurringScreen extends ConsumerWidget {
                       type: type,
                       selectedId: categoryId,
                       onSelect: (id) => setDialogState(() => categoryId = id)),
+                  AccountPicker(
+                      selectedId: accountId,
+                      onSelect: (id) => setDialogState(() => accountId = id)),
                   TextField(
                     controller: dayCtrl,
                     keyboardType: TextInputType.number,
@@ -120,7 +135,7 @@ class RecurringScreen extends ConsumerWidget {
                         categoryId: categoryId,
                         dayOfMonth: day,
                         note: noteCtrl.text.trim(),
-                        accountId: 1, // Task 6 换账户选择器
+                        accountId: accountId,
                         lastGeneratedYyyymm: yyyymmOf(todayYyyymmdd()));
                     if (ctx.mounted) Navigator.pop(ctx);
                   },
@@ -167,8 +182,9 @@ class RecurringScreen extends ConsumerWidget {
                 return ListTile(
                   leading: const CircleAvatar(child: Icon(Icons.event_repeat)),
                   title: Text(catName(r.categoryId)),
-                  subtitle:
-                      Text('每月 ${r.dayOfMonth} 号${r.note.isEmpty ? '' : ' · ${r.note}'}'),
+                  subtitle: Text('每月 ${r.dayOfMonth} 号'
+                      '${r.note.isEmpty ? '' : ' · ${r.note}'}'
+                      ' · ${accountName(r.accountId)}'),
                   trailing: Row(mainAxisSize: MainAxisSize.min, children: [
                     Text('${isExpense ? '-' : '+'}${formatCents(r.amountCents)}',
                         style: TextStyle(

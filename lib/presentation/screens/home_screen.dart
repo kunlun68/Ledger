@@ -6,6 +6,7 @@ import '../../core/money.dart';
 import '../../data/database.dart';
 import '../../data/transaction_type.dart';
 import '../theme/app_theme.dart';
+import 'accounts_screen.dart';
 import 'add_transaction_screen.dart';
 import 'categories_screen.dart';
 import 'settings_screen.dart';
@@ -63,6 +64,19 @@ class HomeScreen extends ConsumerWidget {
         ],
       ),
       body: Column(children: [
+        InkWell(
+          onTap: () => Navigator.push(context,
+              MaterialPageRoute(builder: (_) => const AccountsScreen())),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              const Icon(Icons.account_balance_wallet_outlined, size: 16),
+              const SizedBox(width: 4),
+              Text('总资产 ${formatCents(ref.watch(totalAssetsProvider))}',
+                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+            ]),
+          ),
+        ),
         _SummaryCard(summary: summary),
         Expanded(
           child: txs.isEmpty

@@ -17,11 +17,14 @@ class TransactionsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final txs = ref.watch(monthTransactionsProvider).value ?? const <Transaction>[];
     final cats = ref.watch(allCategoriesProvider).value ?? const <Category>[];
+    final accounts = ref.watch(allAccountsProvider).value ?? const <Account>[];
     final dao = ref.read(transactionsDaoProvider);
 
     String catName(int? id) => id == null
         ? '未分类'
         : cats.where((c) => c.id == id).map((c) => c.name).firstOrNull ?? '未分类';
+    String accountName(int id) =>
+        accounts.where((a) => a.id == id).map((a) => a.name).firstOrNull ?? '未知账户';
 
     // 按日期分组（date 降序）
     final groups = <int, List<Transaction>>{};
@@ -71,15 +74,23 @@ class TransactionsScreen extends ConsumerWidget {
                           child: const Icon(Icons.delete, color: Colors.white)),
                       onDismissed: (_) => delete(tx),
                       child: ListTile(
-                        leading: CircleAvatar(child: Text(catName(tx.categoryId).characters.first)),
-                        title: Text(catName(tx.categoryId)),
-                        subtitle: Text(tx.note.isEmpty ? ' ' : tx.note),
+                        leading: tx.type == TxType.transfer
+                            ? const CircleAvatar(child: Icon(Icons.swap_horiz))
+                            : CircleAvatar(child: Text(catName(tx.categoryId).characters.first)),
+                        title: Text(tx.type == TxType.transfer
+                            ? '${accountName(tx.accountId)} → ${accountName(tx.transferAccountId ?? 0)}'
+                            : catName(tx.categoryId)),
+                        subtitle: Text(tx.type == TxType.transfer
+                            ? (tx.note.isEmpty ? '转账' : tx.note)
+                            : '${accountName(tx.accountId)}${tx.note.isEmpty ? '' : ' · ${tx.note}'}'),
                         trailing: Text(
-                          '${tx.type == TxType.expense ? '-' : '+'}${formatCents(tx.amountCents)}',
+                          '${tx.type == TxType.expense ? '-' : tx.type == TxType.income ? '+' : ''}${formatCents(tx.amountCents)}',
                           style: TextStyle(
                               color: tx.type == TxType.expense
                                   ? AppTheme.expenseColor
-                                  : AppTheme.incomeColor,
+                                  : tx.type == TxType.income
+                                      ? AppTheme.incomeColor
+                                      : null,
                               fontWeight: FontWeight.w600),
                         ),
                         onTap: () => Navigator.push(context, MaterialPageRoute(

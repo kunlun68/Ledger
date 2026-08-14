@@ -8,6 +8,7 @@ import 'package:ledger/data/dao/categories_dao.dart';
 import 'package:ledger/data/dao/transactions_dao.dart';
 import 'package:ledger/data/database.dart';
 import 'package:ledger/data/transaction_type.dart';
+import 'package:ledger/presentation/screens/accounts_screen.dart';
 import 'package:ledger/presentation/screens/add_transaction_screen.dart';
 import 'package:ledger/presentation/screens/categories_screen.dart';
 import 'package:ledger/presentation/screens/home_screen.dart';
@@ -131,5 +132,17 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('设置'), findsOneWidget);
     expect(find.byType(SettingsScreen), findsOneWidget);
+  });
+
+  testWidgets('shows total assets and opens accounts screen', (tester) async {
+    final container = await makeContainer();
+    addTearDown(container.dispose);
+    await tester.pumpWidget(UncontrolledProviderScope(
+        container: container, child: const MaterialApp(home: HomeScreen())));
+    await tester.pumpAndSettle();
+    expect(find.text('总资产 0.00'), findsOneWidget);
+    await tester.tap(find.text('总资产 0.00'));
+    await tester.pumpAndSettle();
+    expect(find.byType(AccountsScreen), findsOneWidget);
   });
 }

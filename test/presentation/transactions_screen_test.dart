@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:ledger/application/providers.dart';
 import 'package:ledger/data/dao/categories_dao.dart';
@@ -16,6 +17,10 @@ void main() {
   setUp(() async {
     db = AppDatabase.open(executor: NativeDatabase.memory());
     await CategoriesDao(db).seedBuiltinCategories();
+    await db.into(db.accounts).insert(AccountsCompanion.insert(
+        name: '现金', icon: 'payments', sortOrder: const Value(0)));
+    await db.into(db.accounts).insert(AccountsCompanion.insert(
+        name: '微信', icon: 'wechat', sortOrder: const Value(1)));
     foodId = (await CategoriesDao(db).getByType(TxType.expense)).first.id;
     await TransactionsDao(db).insertTransaction(TxType.expense, 100, foodId, 20260813, '午饭', accountId: 1);
     await TransactionsDao(db).insertTransaction(TxType.expense, 200, foodId, 20260801, '早饭', accountId: 1);
@@ -41,8 +46,8 @@ void main() {
 
   testWidgets('lists transactions grouped by day', (tester) async {
     await pump(tester);
-    expect(find.text('午饭'), findsOneWidget);
-    expect(find.text('早饭'), findsOneWidget);
+    expect(find.textContaining('午饭'), findsOneWidget); // subtitle: 现金 · 午饭
+    expect(find.textContaining('早饭'), findsOneWidget);
     // 卸载树取消 stream 订阅；推进时钟执行 drift 的清理 Timer（Duration.zero）
     await tester.pumpWidget(const SizedBox());
     await tester.pump(Duration.zero);
@@ -50,12 +55,23 @@ void main() {
 
   testWidgets('swipe deletes and undo restores', (tester) async {
     await pump(tester);
-    await tester.drag(find.text('午饭'), const Offset(-500, 0));
+    await tester.drag(find.textContaining('午饭'), const Offset(-500, 0));
     await tester.pumpAndSettle();
     expect(await TransactionsDao(db).getByMonth(202608), hasLength(1));
     await tester.tap(find.text('撤销'));
     await tester.pumpAndSettle();
     expect(await TransactionsDao(db).getByMonth(202608), hasLength(2));
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump(Duration.zero);
+  });
+
+  testWidgets('shows account name and transfer style', (tester) async {
+    // 插一条转账：现金(1) → 微信(2)，金额 500 分
+    await TransactionsDao(db).insertTransfer(
+        fromAccountId: 1, toAccountId: 2, amountCents: 500, date: 20260813);
+    await pump(tester);
+    expect(find.textContaining('现金 → 微信'), findsOneWidget);
+    expect(find.byIcon(Icons.swap_horiz), findsOneWidget);
     await tester.pumpWidget(const SizedBox());
     await tester.pump(Duration.zero);
   });

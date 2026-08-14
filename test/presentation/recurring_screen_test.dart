@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:ledger/application/providers.dart';
 import 'package:ledger/data/dao/categories_dao.dart';
@@ -15,6 +16,8 @@ void main() {
   setUp(() async {
     db = AppDatabase.open(executor: NativeDatabase.memory());
     await CategoriesDao(db).seedBuiltinCategories();
+    await db.into(db.accounts).insert(
+        AccountsCompanion.insert(name: '现金', icon: 'payments', sortOrder: const Value(0)));
   });
   tearDown(() => db.close());
 
@@ -46,6 +49,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('-3000.00'), findsOneWidget);
     expect(find.textContaining('每月 1 号'), findsOneWidget);
+    expect(find.textContaining('现金'), findsWidgets); // 行内显示账户名
     await tester.pumpWidget(const SizedBox());
     await tester.pump(Duration.zero);
   });
