@@ -20,7 +20,8 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final month = ref.watch(currentMonthProvider);
     final summary = ref.watch(monthSummaryProvider);
-    final txs = ref.watch(monthTransactionsProvider).value ?? const <Transaction>[];
+    final txs =
+        ref.watch(monthTransactionsProvider).value ?? const <Transaction>[];
     final cats = ref.watch(allCategoriesProvider).value ?? const <Category>[];
 
     String catName(int? id) => id == null
@@ -34,79 +35,112 @@ class HomeScreen extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
-                onPressed: () =>
-                    ref.read(currentMonthProvider.notifier).setMonth(_shift(month, -1)),
-                icon: const Icon(Icons.chevron_left)),
-            Text(formatYyyymm(month),
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+              onPressed: () => ref
+                  .read(currentMonthProvider.notifier)
+                  .setMonth(_shift(month, -1)),
+              icon: const Icon(Icons.chevron_left),
+            ),
+            Text(
+              formatYyyymm(month),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
             IconButton(
-                onPressed: () =>
-                    ref.read(currentMonthProvider.notifier).setMonth(_shift(month, 1)),
-                icon: const Icon(Icons.chevron_right)),
+              onPressed: () => ref
+                  .read(currentMonthProvider.notifier)
+                  .setMonth(_shift(month, 1)),
+              icon: const Icon(Icons.chevron_right),
+            ),
           ],
         ),
         actions: [
           IconButton(
-              icon: const Icon(Icons.settings_outlined),
-              tooltip: '设置',
-              onPressed: () => Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => const SettingsScreen()))),
-          IconButton(
-              icon: const Icon(Icons.pie_chart_outline),
-              tooltip: '统计',
-              onPressed: () => Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => const StatisticsScreen()))),
-          IconButton(
-              icon: const Icon(Icons.category_outlined),
-              tooltip: '分类管理',
-              onPressed: () => Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => const CategoriesScreen()))),
-        ],
-      ),
-      body: Column(children: [
-        InkWell(
-          onTap: () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => const AccountsScreen())),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              const Icon(Icons.account_balance_wallet_outlined, size: 16),
-              const SizedBox(width: 4),
-              Text('总资产 ${formatCents(ref.watch(totalAssetsProvider))}',
-                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-            ]),
-          ),
-        ),
-        _SummaryCard(summary: summary),
-        Expanded(
-          child: txs.isEmpty
-              ? const Center(child: Text('还没有记账记录'))
-              : ListView.builder(
-                  itemCount: txs.length > 5 ? 5 : txs.length,
-                  itemBuilder: (_, i) => _TransactionTile(
-                      tx: txs[i],
-                      categoryName: catName(txs[i].categoryId),
-                      // 转账记录不可编辑（记一笔表单只支持支出/收入）
-                      onTap: txs[i].type == TxType.transfer
-                          ? null
-                          : () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => AddTransactionScreen(initial: txs[i])),
-                              )),
-                ),
-        ),
-        TextButton.icon(
+            icon: const Icon(Icons.settings_outlined),
+            tooltip: '设置',
             onPressed: () => Navigator.push(
               context,
-              MaterialPageRoute(
-                  builder: (_) =>
-                      TransactionsScreen(onExit: () => Navigator.pop(context))),
+              MaterialPageRoute(builder: (_) => const SettingsScreen()),
             ),
-            icon: const Icon(Icons.list),
-            label: const Text('查看全部'),
           ),
-      ]),
+          IconButton(
+            icon: const Icon(Icons.pie_chart_outline),
+            tooltip: '统计',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const StatisticsScreen()),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.category_outlined),
+            tooltip: '分类管理',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const CategoriesScreen()),
+            ),
+          ),
+        ],
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            InkWell(
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AccountsScreen()),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.account_balance_wallet_outlined, size: 16),
+                    const SizedBox(width: 4),
+                    Text(
+                      '总资产 ${formatCents(ref.watch(totalAssetsProvider))}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            _SummaryCard(summary: summary),
+            Expanded(
+              child: txs.isEmpty
+                  ? const Center(child: Text('还没有记账记录'))
+                  : ListView.builder(
+                      itemCount: txs.length > 5 ? 5 : txs.length,
+                      itemBuilder: (_, i) => _TransactionTile(
+                        tx: txs[i],
+                        categoryName: catName(txs[i].categoryId),
+                        // 转账记录不可编辑（记一笔表单只支持支出/收入）
+                        onTap: txs[i].type == TxType.transfer
+                            ? null
+                            : () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      AddTransactionScreen(initial: txs[i]),
+                                ),
+                              ),
+                      ),
+                    ),
+            ),
+            TextButton.icon(
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>
+                      TransactionsScreen(onExit: () => Navigator.pop(context)),
+                ),
+              ),
+              icon: const Icon(Icons.list),
+              label: const Text('查看全部'),
+            ),
+          ],
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.push(
           context,
@@ -136,33 +170,49 @@ class _SummaryCard extends StatelessWidget {
       margin: const EdgeInsets.all(12),
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(children: [
-          Text('结余', style: TextStyle(color: c.onSurfaceVariant, fontSize: 13)),
-          Text(
-            formatCents(summary.balanceCents),
-            style: TextStyle(
+        child: Column(
+          children: [
+            Text(
+              '结余',
+              style: TextStyle(color: c.onSurfaceVariant, fontSize: 13),
+            ),
+            Text(
+              formatCents(summary.balanceCents),
+              style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
                 color: summary.balanceCents >= 0
                     ? AppTheme.incomeColor
-                    : AppTheme.expenseColor),
-          ),
-          const SizedBox(height: 12),
-          Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-            Text('收入 ${formatCents(summary.incomeCents)}',
-                style: const TextStyle(color: AppTheme.incomeColor)),
-            Text('支出 ${formatCents(summary.expenseCents)}',
-                style: const TextStyle(color: AppTheme.expenseColor)),
-          ]),
-        ]),
+                    : AppTheme.expenseColor,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Text(
+                  '收入 ${formatCents(summary.incomeCents)}',
+                  style: const TextStyle(color: AppTheme.incomeColor),
+                ),
+                Text(
+                  '支出 ${formatCents(summary.expenseCents)}',
+                  style: const TextStyle(color: AppTheme.expenseColor),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
 class _TransactionTile extends StatelessWidget {
-  const _TransactionTile(
-      {required this.tx, required this.categoryName, required this.onTap});
+  const _TransactionTile({
+    required this.tx,
+    required this.categoryName,
+    required this.onTap,
+  });
 
   final Transaction tx;
   final String categoryName;
@@ -179,7 +229,11 @@ class _TransactionTile extends StatelessWidget {
       subtitle: Text(tx.note.isEmpty ? ' ' : tx.note),
       trailing: Text(
         '$sign${formatCents(tx.amountCents)}',
-        style: TextStyle(color: color, fontWeight: FontWeight.w600, fontSize: 16),
+        style: TextStyle(
+          color: color,
+          fontWeight: FontWeight.w600,
+          fontSize: 16,
+        ),
       ),
       onTap: onTap,
     );
