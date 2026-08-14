@@ -87,7 +87,7 @@ abstract class BackupIO {
 ### 导出/备份流程
 
 1. 从 DAO 取全量数据 → core 序列化 → 写 `Directory.systemTemp` 临时文件
-2. `shareFile(path, text: '记账备份')` → 完成后删除临时文件（best-effort）
+2. `shareFile(path, text: '记账备份')` → 不主动删除临时文件（分享面板返回不等同于接收方读完文件，微信/QQ 需时间拷贝；系统 cache 自清）
 
 ## 依赖
 
@@ -98,7 +98,6 @@ abstract class BackupIO {
 
 | 场景 | 行为 |
 | --- | --- |
-|---|---|
 | 备份文件损坏/不兼容 | SnackBar 显示具体中文原因，数据不动 |
 | 分享面板取消 | 静默返回 |
 | 临时文件写入失败 | SnackBar "导出失败" |
