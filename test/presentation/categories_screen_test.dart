@@ -49,11 +49,71 @@ void main() {
     await tester.pump(Duration.zero);
   });
 
-  testWidgets('builtin category cannot be deleted', (tester) async {
+  testWidgets('builtin category has no delete button, tap opens budget dialog', (tester) async {
+    await pump(tester);
+    expect(find.byIcon(Icons.delete_outline), findsNothing); // 内置分类无删除按钮
+    await tester.tap(find.text('餐饮'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('设置预算'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump(Duration.zero);
+  });
+
+  testWidgets('sets budget and shows old value on reopen', (tester) async {
     await pump(tester);
     await tester.tap(find.text('餐饮'));
     await tester.pumpAndSettle();
-    expect(find.text('内置分类不可删除'), findsOneWidget);
+    await tester.enterText(find.byType(TextField), '100.50');
+    await tester.tap(find.text('确定'));
+    await tester.pumpAndSettle();
+    final dao = CategoriesDao(db);
+    final food = (await dao.getByType(TxType.expense)).firstWhere((c) => c.name == '餐饮');
+    expect(food.monthlyBudgetCents, 10050);
+    // 重开显示旧值
+    await tester.tap(find.text('餐饮'));
+    await tester.pumpAndSettle();
+    expect(find.text('100.50'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump(Duration.zero);
+  });
+
+  testWidgets('empty input clears budget', (tester) async {
+    final dao = CategoriesDao(db);
+    final food = (await dao.getByType(TxType.expense)).firstWhere((c) => c.name == '餐饮');
+    await dao.updateBudget(food.id, 10000);
+    await pump(tester);
+    await tester.tap(find.text('餐饮'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), '');
+    await tester.tap(find.text('确定'));
+    await tester.pumpAndSettle();
+    final after = (await dao.getByType(TxType.expense)).firstWhere((c) => c.name == '餐饮');
+    expect(after.monthlyBudgetCents, 0);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump(Duration.zero);
+  });
+
+  testWidgets('income category has no budget dialog', (tester) async {
+    await pump(tester);
+    await tester.tap(find.text('收入'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('工资'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('设置预算'), findsNothing);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump(Duration.zero);
+  });
+
+  testWidgets('invalid budget amount shows error and keeps dialog open', (tester) async {
+    await pump(tester);
+    await tester.tap(find.text('餐饮'));
+    await tester.pumpAndSettle();
+    // formatter 允许 "."（\d{0,7}(\.\d{0,2})?），但 parseCents 拒绝 → 非法场景
+    await tester.enterText(find.byType(TextField), '.');
+    await tester.tap(find.text('确定'));
+    await tester.pumpAndSettle();
+    expect(find.text('请输入有效金额'), findsOneWidget); // SnackBar
+    expect(find.textContaining('设置预算'), findsOneWidget); // dialog 未关
     await tester.pumpWidget(const SizedBox());
     await tester.pump(Duration.zero);
   });
