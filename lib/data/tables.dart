@@ -22,3 +22,15 @@ class Transactions extends Table {
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
 }
+
+class RecurringRules extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get type => textEnum<TxType>()();
+  IntColumn get amountCents => integer()(); // 单位：分
+  IntColumn get categoryId => integer().references(Categories, #id)();
+  TextColumn get note => text().withDefault(const Constant(''))();
+  IntColumn get dayOfMonth => integer()(); // 每月几号，1-31
+  /// 上次生成的月份 yyyymm，0 = 从未生成
+  IntColumn get lastGeneratedYyyymm => integer().withDefault(const Constant(0))();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+}

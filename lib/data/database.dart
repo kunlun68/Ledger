@@ -5,7 +5,7 @@ import 'transaction_type.dart';
 
 part 'database.g.dart';
 
-@DriftDatabase(tables: [Categories, Transactions])
+@DriftDatabase(tables: [Categories, Transactions, RecurringRules])
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
@@ -13,7 +13,7 @@ class AppDatabase extends _$AppDatabase {
       AppDatabase(executor ?? driftDatabase(name: 'ledger'));
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -21,6 +21,9 @@ class AppDatabase extends _$AppDatabase {
         onUpgrade: (m, from, to) async {
           if (from < 2) {
             await m.addColumn(categories, categories.monthlyBudgetCents);
+          }
+          if (from < 3) {
+            await m.createTable(recurringRules);
           }
         },
       );

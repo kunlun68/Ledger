@@ -50,4 +50,50 @@ CREATE TABLE transactions (
     expect(cats.single.monthlyBudgetCents, 0); // 新列默认 0
     expect(await db.select(db.transactions).get(), isEmpty);
   });
+
+  test('migration from v2 keeps data and creates recurring_rules', () async {
+    final dir = Directory.systemTemp.createTempSync('ledger_migration2');
+    final file = File('${dir.path}${Platform.pathSeparator}test.db');
+    addTearDown(() {
+      dir.deleteSync(recursive: true);
+    });
+
+    // 手写 v2 schema（categories 含 monthly_budget_cents）
+    final v2 = AppDatabase.open(executor: NativeDatabase(file));
+    await v2.customStatement('DROP TABLE IF EXISTS transactions');
+    await v2.customStatement('DROP TABLE IF EXISTS categories');
+    await v2.customStatement('''
+CREATE TABLE categories (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  icon TEXT NOT NULL,
+  type TEXT NOT NULL,
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  is_builtin INTEGER NOT NULL DEFAULT 0,
+  monthly_budget_cents INTEGER NOT NULL DEFAULT 0
+)''');
+    await v2.customStatement('''
+CREATE TABLE transactions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  type TEXT NOT NULL,
+  amount_cents INTEGER NOT NULL,
+  category_id INTEGER NOT NULL REFERENCES categories(id),
+  note TEXT NOT NULL DEFAULT '',
+  date INTEGER NOT NULL,
+  created_at INTEGER NOT NULL DEFAULT 0,
+  updated_at INTEGER NOT NULL DEFAULT 0
+)''');
+    await v2.customStatement(
+        "INSERT INTO categories (name, icon, type, sort_order, is_builtin, monthly_budget_cents) "
+        "VALUES ('餐饮', 'restaurant', 'expense', 0, 1, 15000)");
+    await v2.customStatement('PRAGMA user_version = 2');
+    await v2.close();
+
+    final db = AppDatabase.open(executor: NativeDatabase(file));
+    addTearDown(db.close);
+    final cats = await db.select(db.categories).get();
+    expect(cats.single.name, '餐饮');
+    expect(cats.single.monthlyBudgetCents, 15000);
+    expect(await db.select(db.recurringRules).get(), isEmpty); // 新表存在且为空
+  });
 }
