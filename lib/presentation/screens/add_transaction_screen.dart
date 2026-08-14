@@ -5,6 +5,7 @@ import '../../core/date_util.dart';
 import '../../core/money.dart';
 import '../../data/database.dart';
 import '../../data/transaction_type.dart';
+import '../widgets/account_picker.dart';
 import '../widgets/amount_field.dart';
 import '../widgets/category_picker.dart';
 
@@ -22,6 +23,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   late TxType _type;
   late final TextEditingController _amount;
   int _categoryId = -1;
+  int _accountId = -1;
   int _date = 0;
   String _note = '';
 
@@ -32,9 +34,11 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     _type = t?.type ?? TxType.expense;
     _amount = TextEditingController(text: t == null ? '' : formatCents(t.amountCents));
     _categoryId = t?.categoryId ?? -1;
+    _accountId = t?.accountId ?? -1;
     _date = t?.date ?? todayYyyymmdd();
     _note = t?.note ?? '';
     _autoSelectCategory(ref.read(allCategoriesProvider).value);
+    _autoSelectAccount(ref.read(allAccountsProvider).value);
   }
 
   @override
@@ -48,6 +52,12 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     if (cats == null || _categoryId >= 0) return;
     final first = cats.where((c) => c.type == _type).firstOrNull;
     if (first != null) _categoryId = first.id;
+  }
+
+  /// 自动选中第一个账户；账户流到达后经 build 中的 watch 兜底。
+  void _autoSelectAccount(List<Account>? accounts) {
+    if (accounts == null || accounts.isEmpty || _accountId >= 0) return;
+    _accountId = accounts.first.id;
   }
 
   Future<void> _save() async {
@@ -66,7 +76,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     final t = widget.initial;
     if (t == null) {
       await dao.insertTransaction(_type, cents, _categoryId, _date, _note.trim(),
-          accountId: 1); // Task 4 换账户选择器
+          accountId: _accountId);
     } else {
       await dao.updateTransaction(t,
           type: _type, amountCents: cents, categoryId: _categoryId, date: _date, note: _note.trim());
@@ -80,6 +90,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   @override
   Widget build(BuildContext context) {
     _autoSelectCategory(ref.watch(allCategoriesProvider).value);
+    _autoSelectAccount(ref.watch(allAccountsProvider).value);
     return Scaffold(
       appBar: AppBar(title: Text(widget.initial == null ? '记一笔' : '编辑记录')),
       body: SafeArea(
@@ -97,6 +108,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
           ),
           const SizedBox(height: 8),
           AmountField(controller: _amount),
+          AccountPicker(
+              selectedId: _accountId, onSelect: (id) => setState(() => _accountId = id)),
           CategoryPicker(
               type: _type, selectedId: _categoryId, onSelect: (id) => setState(() => _categoryId = id)),
           ListTile(

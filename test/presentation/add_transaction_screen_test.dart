@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:ledger/application/providers.dart';
 import 'package:ledger/core/date_util.dart';
@@ -16,6 +17,8 @@ void main() {
   setUp(() async {
     db = AppDatabase.open(executor: NativeDatabase.memory());
     await CategoriesDao(db).seedBuiltinCategories();
+    await db.into(db.accounts).insert(
+        AccountsCompanion.insert(name: '现金', icon: 'payments', sortOrder: const Value(0)));
   });
   tearDown(() => db.close());
 
@@ -37,6 +40,7 @@ void main() {
     final txs = await TransactionsDao(db).getByMonth(yyyymmOf(todayYyyymmdd()));
     expect(txs.single.amountCents, 1234);
     expect(txs.single.type, TxType.expense);
+    expect(txs.single.accountId, 1); // 默认账户
     // 卸载树取消 stream 订阅；推进时钟执行 drift 的清理 Timer（Duration.zero）
     await tester.pumpWidget(const SizedBox());
     await tester.pump(Duration.zero);
@@ -51,5 +55,22 @@ void main() {
     expect(await TransactionsDao(db).getByMonth(yyyymmOf(todayYyyymmdd())), isEmpty);
     await tester.pumpWidget(const SizedBox());
     await tester.pump(Duration.zero); // 推进时钟执行 drift 清理 Timer
+  });
+
+  testWidgets('shows account picker and saves with selected account', (tester) async {
+    // 加第二个账户
+    await db.into(db.accounts).insert(
+        AccountsCompanion.insert(name: '微信', icon: 'wechat', sortOrder: const Value(1)));
+    final wxId = (await db.select(db.accounts).get()).firstWhere((a) => a.name == '微信').id;
+    await pumpForm(tester);
+    await tester.tap(find.text('微信'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).first, '5.00');
+    await tester.tap(find.text('保存'));
+    await tester.pumpAndSettle();
+    final txs = await TransactionsDao(db).getByMonth(yyyymmOf(todayYyyymmdd()));
+    expect(txs.single.accountId, wxId);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump(Duration.zero);
   });
 }

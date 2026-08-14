@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/date_util.dart';
 import '../core/stats.dart';
+import '../data/dao/accounts_dao.dart';
 import '../data/dao/backup_dao.dart';
 import '../data/dao/categories_dao.dart';
 import '../data/dao/recurring_dao.dart';
@@ -56,3 +57,13 @@ final backupIOProvider = Provider<BackupIO>((ref) => SharePlusBackupIO());
 final recurringDaoProvider = Provider((ref) => RecurringDao(ref.watch(databaseProvider)));
 final recurringRulesProvider = StreamProvider<List<RecurringRule>>(
     (ref) => ref.watch(recurringDaoProvider).watchAll());
+
+final accountsDaoProvider = Provider((ref) => AccountsDao(ref.watch(databaseProvider)));
+final allAccountsProvider = StreamProvider<List<Account>>(
+    (ref) => ref.watch(accountsDaoProvider).watchAll());
+
+/// 总资产（分）：全部账户余额合计
+final totalAssetsProvider = Provider<int>((ref) {
+  final txs = ref.watch(allTransactionsProvider).value ?? const <Transaction>[];
+  return totalAssets(txs);
+});
