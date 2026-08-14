@@ -1,1 +1,1 @@
-enum TxType { expense, income }
+enum TxType { expense, income, transfer }

@@ -19,7 +19,7 @@ void main() {
     await CategoriesDao(db).seedBuiltinCategories();
     final cats = await CategoriesDao(db).getByType(TxType.expense);
     await TransactionsDao(db)
-        .insertTransaction(TxType.expense, 1234, cats.first.id, 20260813, '午饭');
+        .insertTransaction(TxType.expense, 1234, cats.first.id, 20260813, '午饭', accountId: 1);
   });
 
   tearDown(() async {

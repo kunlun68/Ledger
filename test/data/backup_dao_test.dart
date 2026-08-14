@@ -20,7 +20,7 @@ void main() {
     await CategoriesDao(db).seedBuiltinCategories();
     final cats = await CategoriesDao(db).getByType(TxType.expense);
     await TransactionsDao(db)
-        .insertTransaction(TxType.expense, 100, cats.first.id, 20260813, '午饭');
+        .insertTransaction(TxType.expense, 100, cats.first.id, 20260813, '午饭', accountId: 1);
     final all = await dao.exportAll();
     expect(all.categories, hasLength(11));
     expect(all.transactions, hasLength(1));
@@ -32,7 +32,7 @@ void main() {
     final backup = await dao.exportAll();
     // 备份后再加一条，恢复应将其清掉
     await TransactionsDao(db)
-        .insertTransaction(TxType.expense, 999, backup.categories.first.id, 20260813, '要消失');
+        .insertTransaction(TxType.expense, 999, backup.categories.first.id, 20260813, '要消失', accountId: 1);
     await dao.restoreAll(categories: backup.categories, transactions: backup.transactions);
     final after = await dao.exportAll();
     expect(after.transactions.any((t) => t.note == '要消失'), isFalse);
@@ -43,7 +43,7 @@ void main() {
     await CategoriesDao(db).seedBuiltinCategories();
     final backup = await dao.exportAll();
     await TransactionsDao(db)
-        .insertTransaction(TxType.expense, 999, backup.categories.first.id, 20260813, '保留我');
+        .insertTransaction(TxType.expense, 999, backup.categories.first.id, 20260813, '保留我', accountId: 1);
     // 构造主键冲突：两个分类同 id
     final bad = [...backup.categories, backup.categories.first];
     await expectLater(

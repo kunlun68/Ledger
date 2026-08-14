@@ -120,6 +120,7 @@ class RecurringScreen extends ConsumerWidget {
                         categoryId: categoryId,
                         dayOfMonth: day,
                         note: noteCtrl.text.trim(),
+                        accountId: 1, // Task 6 换账户选择器
                         lastGeneratedYyyymm: yyyymmOf(todayYyyymmdd()));
                     if (ctx.mounted) Navigator.pop(ctx);
                   },

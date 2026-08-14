@@ -19,8 +19,9 @@ class TransactionsScreen extends ConsumerWidget {
     final cats = ref.watch(allCategoriesProvider).value ?? const <Category>[];
     final dao = ref.read(transactionsDaoProvider);
 
-    String catName(int id) =>
-        cats.where((c) => c.id == id).map((c) => c.name).firstOrNull ?? '未分类';
+    String catName(int? id) => id == null
+        ? '未分类'
+        : cats.where((c) => c.id == id).map((c) => c.name).firstOrNull ?? '未分类';
 
     // 按日期分组（date 降序）
     final groups = <int, List<Transaction>>{};
@@ -36,7 +37,8 @@ class TransactionsScreen extends ConsumerWidget {
         action: SnackBarAction(
           label: '撤销',
           onPressed: () => dao.insertTransaction(
-              tx.type, tx.amountCents, tx.categoryId, tx.date, tx.note),
+              tx.type, tx.amountCents, tx.categoryId, tx.date, tx.note,
+              accountId: tx.accountId),
         ),
       ));
     }

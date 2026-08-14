@@ -6,22 +6,29 @@ class TransactionsDao {
   TransactionsDao(this.db);
   final AppDatabase db;
 
-  Future<void> insertTransaction(
-          TxType type, int amountCents, int categoryId, int date, String note) =>
+  Future<void> insertTransaction(TxType type, int amountCents, int? categoryId,
+          int date, String note, {required int accountId}) =>
       db.into(db.transactions).insert(TransactionsCompanion.insert(
             type: type,
             amountCents: amountCents,
-            categoryId: categoryId,
+            categoryId: Value(categoryId),
+            accountId: Value(accountId),
             date: date,
             note: Value(note),
           ));
 
   Future<void> updateTransaction(Transaction t,
-          {TxType? type, int? amountCents, int? categoryId, int? date, String? note}) =>
+          {TxType? type,
+          int? amountCents,
+          int? categoryId,
+          int? date,
+          String? note,
+          int? accountId}) =>
       db.update(db.transactions).replace(t.copyWith(
             type: type ?? t.type,
             amountCents: amountCents ?? t.amountCents,
-            categoryId: categoryId ?? t.categoryId,
+            categoryId: categoryId != null ? Value(categoryId) : const Value.absent(),
+            accountId: accountId ?? t.accountId,
             date: date ?? t.date,
             note: note ?? t.note,
             updatedAt: DateTime.now(),

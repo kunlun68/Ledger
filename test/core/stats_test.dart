@@ -10,6 +10,8 @@ Transaction tx(TxType type, int cents, int categoryId, int date) => Transaction(
     categoryId: categoryId,
     note: '',
     date: date,
+    accountId: 1,
+    transferAccountId: null,
     createdAt: DateTime(2026),
     updatedAt: DateTime(2026));
 

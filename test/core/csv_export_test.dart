@@ -30,6 +30,8 @@ void main() {
       categoryId: categoryId,
       note: note,
       date: 20260813,
+      accountId: 1,
+      transferAccountId: null,
       createdAt: DateTime(2026, 8, 13),
       updatedAt: DateTime(2026, 8, 13));
 

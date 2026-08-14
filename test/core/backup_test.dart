@@ -19,6 +19,8 @@ Transaction _tx({int id = 1}) => Transaction(
     categoryId: 1,
     note: '午饭',
     date: 20260813,
+    accountId: 1,
+    transferAccountId: null,
     createdAt: DateTime(2026, 8, 13, 12),
     updatedAt: DateTime(2026, 8, 13, 12));
 

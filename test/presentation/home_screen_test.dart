@@ -44,7 +44,7 @@ void main() {
   testWidgets('shows summary and recent transactions', (tester) async {
     final cats = await CategoriesDao(db).getByType(TxType.expense);
     await TransactionsDao(db)
-        .insertTransaction(TxType.expense, 1234, cats.first.id, 20260813, '午饭');
+        .insertTransaction(TxType.expense, 1234, cats.first.id, 20260813, '午饭', accountId: 1);
     final container = await makeContainer();
     addTearDown(container.dispose);
     await tester.pumpWidget(UncontrolledProviderScope(
@@ -70,7 +70,7 @@ void main() {
   testWidgets('tapping a transaction opens edit screen', (tester) async {
     final cats = await CategoriesDao(db).getByType(TxType.expense);
     await TransactionsDao(db)
-        .insertTransaction(TxType.expense, 1234, cats.first.id, 20260813, '午饭');
+        .insertTransaction(TxType.expense, 1234, cats.first.id, 20260813, '午饭', accountId: 1);
     final container = await makeContainer();
     addTearDown(container.dispose);
     await tester.pumpWidget(UncontrolledProviderScope(

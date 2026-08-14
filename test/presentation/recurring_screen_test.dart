@@ -71,6 +71,7 @@ void main() {
         categoryId: 1,
         dayOfMonth: 1,
         note: '房租',
+        accountId: 1,
         lastGeneratedYyyymm: 202608);
     await pump(tester);
     await tester.tap(find.byIcon(Icons.delete_outline));

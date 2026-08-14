@@ -65,7 +65,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     final dao = ref.read(transactionsDaoProvider);
     final t = widget.initial;
     if (t == null) {
-      await dao.insertTransaction(_type, cents, _categoryId, _date, _note.trim());
+      await dao.insertTransaction(_type, cents, _categoryId, _date, _note.trim(),
+          accountId: 1); // Task 4 换账户选择器
     } else {
       await dao.updateTransaction(t,
           type: _type, amountCents: cents, categoryId: _categoryId, date: _date, note: _note.trim());

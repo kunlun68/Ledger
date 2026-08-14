@@ -22,8 +22,9 @@ class HomeScreen extends ConsumerWidget {
     final txs = ref.watch(monthTransactionsProvider).value ?? const <Transaction>[];
     final cats = ref.watch(allCategoriesProvider).value ?? const <Category>[];
 
-    String catName(int id) =>
-        cats.where((c) => c.id == id).map((c) => c.name).firstOrNull ?? '未分类';
+    String catName(int? id) => id == null
+        ? '未分类'
+        : cats.where((c) => c.id == id).map((c) => c.name).firstOrNull ?? '未分类';
 
     return Scaffold(
       appBar: AppBar(

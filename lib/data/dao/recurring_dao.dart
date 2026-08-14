@@ -14,6 +14,7 @@ class RecurringDao {
           required int categoryId,
           required int dayOfMonth,
           String note = '',
+          required int accountId,
           required int lastGeneratedYyyymm}) =>
       db.into(db.recurringRules).insert(RecurringRulesCompanion.insert(
             type: type,
@@ -21,6 +22,7 @@ class RecurringDao {
             categoryId: categoryId,
             dayOfMonth: dayOfMonth,
             note: Value(note),
+            accountId: Value(accountId),
             lastGeneratedYyyymm: Value(lastGeneratedYyyymm),
           ));
 
@@ -40,7 +42,8 @@ class RecurringDao {
           await db.into(db.transactions).insert(TransactionsCompanion.insert(
                 type: r.type,
                 amountCents: r.amountCents,
-                categoryId: r.categoryId,
+                categoryId: Value(r.categoryId),
+                accountId: Value(r.accountId),
                 note: Value(r.note),
                 date: m * 100 + clampDayToMonth(r.dayOfMonth, m),
               ));

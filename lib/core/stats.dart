@@ -9,7 +9,9 @@ int totalByType(List<Transaction> txs, TxType type) => txs
 Map<int, int> expenseByCategory(List<Transaction> txs) {
   final map = <int, int>{};
   for (final t in txs.where((t) => t.type == TxType.expense)) {
-    map[t.categoryId] = (map[t.categoryId] ?? 0) + t.amountCents;
+    final cid = t.categoryId;
+    if (cid == null) continue; // 转账等无分类记录不参与
+    map[cid] = (map[cid] ?? 0) + t.amountCents;
   }
   return map;
 }

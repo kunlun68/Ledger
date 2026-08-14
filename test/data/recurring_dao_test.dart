@@ -27,6 +27,7 @@ void main() {
         categoryId: await foodId(),
         dayOfMonth: 1,
         note: '房租',
+        accountId: 1,
         lastGeneratedYyyymm: 202604);
     await dao.generateDue(202608);
     final txs = await TransactionsDao(db).getByMonth(202605);
@@ -44,6 +45,7 @@ void main() {
         categoryId: await foodId(),
         dayOfMonth: 15,
         note: '',
+        accountId: 1,
         lastGeneratedYyyymm: 202606);
     await dao.generateDue(202608);
     await dao.generateDue(202608); // 再跑不重复
@@ -58,6 +60,7 @@ void main() {
         categoryId: await foodId(),
         dayOfMonth: 1,
         note: '',
+        accountId: 1,
         lastGeneratedYyyymm: 202608);
     await dao.generateDue(202608);
     final txs = await TransactionsDao(db).getByMonth(202608);
@@ -71,6 +74,7 @@ void main() {
         categoryId: await foodId(),
         dayOfMonth: 30,
         note: '',
+        accountId: 1,
         lastGeneratedYyyymm: 202601);
     await dao.generateDue(202602);
     final txs = await TransactionsDao(db).getByMonth(202602);
@@ -84,6 +88,7 @@ void main() {
         categoryId: await foodId(),
         dayOfMonth: 1,
         note: '',
+        accountId: 1,
         lastGeneratedYyyymm: 202608);
     final rules = await dao.watchAll().first;
     expect(rules, hasLength(1));

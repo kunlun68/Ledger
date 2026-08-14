@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:ledger/data/dao/categories_dao.dart';
 import 'package:ledger/data/database.dart';
@@ -33,7 +34,10 @@ void main() {
     await dao.seedBuiltinCategories();
     final food = (await dao.getByType(TxType.expense)).first;
     await db.into(db.transactions).insert(TransactionsCompanion.insert(
-        type: TxType.expense, amountCents: 100, categoryId: food.id, date: 20260813));
+        type: TxType.expense,
+        amountCents: 100,
+        categoryId: Value(food.id),
+        date: 20260813));
     expect(() => dao.deleteCategory(food), throwsA(isA<CategoryInUseException>()));
   });
 

@@ -25,7 +25,7 @@ void main() {
 
   test('insert and getById roundtrip', () async {
     await seed();
-    await dao.insertTransaction(TxType.expense, 1234, foodId, 20260813, '午饭');
+    await dao.insertTransaction(TxType.expense, 1234, foodId, 20260813, '午饭', accountId: 1);
     final t = await dao.getById(1);
     expect(t!.amountCents, 1234);
     expect(t.note, '午饭');
@@ -34,16 +34,16 @@ void main() {
 
   test('getByMonth returns only transactions in that month, sorted', () async {
     await seed();
-    await dao.insertTransaction(TxType.expense, 100, foodId, 20260731, '七月末');
-    await dao.insertTransaction(TxType.expense, 200, foodId, 20260801, '八月一');
-    await dao.insertTransaction(TxType.expense, 300, foodId, 20260813, '八月十三');
+    await dao.insertTransaction(TxType.expense, 100, foodId, 20260731, '七月末', accountId: 1);
+    await dao.insertTransaction(TxType.expense, 200, foodId, 20260801, '八月一', accountId: 1);
+    await dao.insertTransaction(TxType.expense, 300, foodId, 20260813, '八月十三', accountId: 1);
     final august = await dao.getByMonth(202608);
     expect(august.map((t) => t.note).toList(), ['八月一', '八月十三']);
   });
 
   test('update and delete', () async {
     await seed();
-    await dao.insertTransaction(TxType.expense, 100, foodId, 20260813, 'a');
+    await dao.insertTransaction(TxType.expense, 100, foodId, 20260813, 'a', accountId: 1);
     final t = await dao.getById(1);
     await dao.updateTransaction(t!, amountCents: 999, note: 'b');
     final updated = await dao.getById(1);
@@ -55,8 +55,8 @@ void main() {
 
   test('search matches note keyword', () async {
     await seed();
-    await dao.insertTransaction(TxType.expense, 100, foodId, 20260813, '麦当劳');
-    await dao.insertTransaction(TxType.expense, 200, foodId, 20260813, '星巴克');
+    await dao.insertTransaction(TxType.expense, 100, foodId, 20260813, '麦当劳', accountId: 1);
+    await dao.insertTransaction(TxType.expense, 200, foodId, 20260813, '星巴克', accountId: 1);
     final hits = await dao.search('麦当');
     expect(hits.single.note, '麦当劳');
   });
@@ -66,7 +66,7 @@ void main() {
     final stream = dao.watchByMonth(202608);
     final emitted = <List<Transaction>>[];
     final sub = stream.listen(emitted.add);
-    await dao.insertTransaction(TxType.expense, 100, foodId, 20260813, 'x');
+    await dao.insertTransaction(TxType.expense, 100, foodId, 20260813, 'x', accountId: 1);
     await Future<void>.delayed(const Duration(milliseconds: 50));
     await sub.cancel();
     expect(emitted.length, greaterThanOrEqualTo(1));

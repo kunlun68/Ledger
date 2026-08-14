@@ -61,7 +61,7 @@ void main() {
   testWidgets('export csv shares a temp file', (tester) async {
     final cats = await CategoriesDao(db).getByType(TxType.expense);
     await TransactionsDao(db)
-        .insertTransaction(TxType.expense, 100, cats.first.id, 20260813, '午饭');
+        .insertTransaction(TxType.expense, 100, cats.first.id, 20260813, '午饭', accountId: 1);
     await pump(tester);
     // 真实文件 IO 在 fake-async zone 不会完成，需 runAsync 驱动
     await tester.runAsync(() async {
@@ -80,7 +80,7 @@ void main() {
   testWidgets('restore confirm replaces data', (tester) async {
     final cats = await CategoriesDao(db).getByType(TxType.expense);
     await TransactionsDao(db)
-        .insertTransaction(TxType.expense, 100, cats.first.id, 20260813, '旧记录');
+        .insertTransaction(TxType.expense, 100, cats.first.id, 20260813, '旧记录', accountId: 1);
     // 备份内容：1 个交易"新记录"
     io.pickedContent = encodeBackup(cats, [
       Transaction(
@@ -90,6 +90,8 @@ void main() {
           categoryId: cats.first.id,
           note: '新记录',
           date: 20260814,
+          accountId: 1,
+          transferAccountId: null,
           createdAt: DateTime(2026, 8, 14),
           updatedAt: DateTime(2026, 8, 14))
     ]);
@@ -109,7 +111,7 @@ void main() {
   testWidgets('restore cancel keeps data', (tester) async {
     final cats = await CategoriesDao(db).getByType(TxType.expense);
     await TransactionsDao(db)
-        .insertTransaction(TxType.expense, 100, cats.first.id, 20260813, '旧记录');
+        .insertTransaction(TxType.expense, 100, cats.first.id, 20260813, '旧记录', accountId: 1);
     io.pickedContent = encodeBackup(cats, const []);
     await pump(tester);
     await tester.tap(find.text('恢复'));

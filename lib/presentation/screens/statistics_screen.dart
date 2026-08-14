@@ -29,8 +29,9 @@ class StatisticsScreen extends ConsumerWidget {
     final byCategory = ref.watch(categoryExpenseProvider);
     final trend = monthlyTrend(all, months: 6);
 
-    String catName(int id) =>
-        cats.where((c) => c.id == id).map((c) => c.name).firstOrNull ?? '未分类';
+    String catName(int? id) => id == null
+        ? '未分类'
+        : cats.where((c) => c.id == id).map((c) => c.name).firstOrNull ?? '未分类';
     final budgetOf = <int, int>{for (final c in cats) c.id: c.monthlyBudgetCents};
 
     final ranking = byCategory.entries.toList()

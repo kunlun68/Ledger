@@ -99,9 +99,12 @@ Transaction _parseTransaction(Object? raw) {
     id: m['id'] as int,
     type: TxType.values.byName(m['type'] as String),
     amountCents: m['amountCents'] as int,
-    categoryId: m['categoryId'] as int,
+    categoryId: m['categoryId'] as int?,
     note: m['note'] as String,
     date: m['date'] as int,
+    // 旧版备份（v3）无账户字段，缺省到默认账户
+    accountId: m['accountId'] as int? ?? 1,
+    transferAccountId: m['transferAccountId'] as int?,
     createdAt: DateTime.parse(m['createdAt'] as String),
     updatedAt: DateTime.parse(m['updatedAt'] as String),
   );

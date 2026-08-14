@@ -17,8 +17,8 @@ void main() {
     db = AppDatabase.open(executor: NativeDatabase.memory());
     await CategoriesDao(db).seedBuiltinCategories();
     foodId = (await CategoriesDao(db).getByType(TxType.expense)).first.id;
-    await TransactionsDao(db).insertTransaction(TxType.expense, 100, foodId, 20260813, '午饭');
-    await TransactionsDao(db).insertTransaction(TxType.expense, 200, foodId, 20260801, '早饭');
+    await TransactionsDao(db).insertTransaction(TxType.expense, 100, foodId, 20260813, '午饭', accountId: 1);
+    await TransactionsDao(db).insertTransaction(TxType.expense, 200, foodId, 20260801, '早饭', accountId: 1);
   });
   tearDown(() => db.close());
 

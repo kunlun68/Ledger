@@ -17,8 +17,8 @@ void main() {
     db = AppDatabase.open(executor: NativeDatabase.memory());
     await CategoriesDao(db).seedBuiltinCategories();
     final cats = await CategoriesDao(db).getByType(TxType.expense);
-    await TransactionsDao(db).insertTransaction(TxType.expense, 1000, cats[0].id, 20260810, 'a');
-    await TransactionsDao(db).insertTransaction(TxType.expense, 2000, cats[1].id, 20260811, 'b');
+    await TransactionsDao(db).insertTransaction(TxType.expense, 1000, cats[0].id, 20260810, 'a', accountId: 1);
+    await TransactionsDao(db).insertTransaction(TxType.expense, 2000, cats[1].id, 20260811, 'b', accountId: 1);
   });
   tearDown(() => db.close());
 
