@@ -26,7 +26,7 @@ class SettingsScreen extends ConsumerWidget {
         await file.writeAsString(content);
         await io.shareFile(file.path, text: '记账备份');
       } catch (_) {
-        show('导出失败');
+        if (context.mounted) show('导出失败');
       }
     }
 
@@ -52,6 +52,7 @@ class SettingsScreen extends ConsumerWidget {
         return;
       }
       final current = await dao.exportAll();
+      if (!context.mounted) return;
       final ok = await showDialog<bool>(
         context: context,
         builder: (ctx) => AlertDialog(
