@@ -183,21 +183,27 @@ class RecurringScreen extends ConsumerWidget {
               itemBuilder: (_, i) {
                 final r = rules[i];
                 final isExpense = r.type == TxType.expense;
-                return ListTile(
-                  leading: const CircleAvatar(child: Icon(Icons.event_repeat)),
-                  title: Text(catName(r.categoryId)),
-                  subtitle: Text('每月 ${r.dayOfMonth} 号'
-                      '${r.note.isEmpty ? '' : ' · ${r.note}'}'
-                      ' · ${accountName(r.accountId)}'),
-                  trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-                    Text('${isExpense ? '-' : '+'}${formatCents(r.amountCents)}',
-                        style: TextStyle(
-                            color: isExpense ? AppTheme.expenseColor : AppTheme.incomeColor,
-                            fontWeight: FontWeight.w600)),
-                    IconButton(
-                        icon: const Icon(Icons.delete_outline),
-                        onPressed: () => deleteFlow(r)),
-                  ]),
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                  child: Card(
+                    margin: EdgeInsets.zero,
+                    child: ListTile(
+                      leading: const CircleAvatar(child: Icon(Icons.event_repeat)),
+                      title: Text(catName(r.categoryId)),
+                      subtitle: Text('每月 ${r.dayOfMonth} 号'
+                          '${r.note.isEmpty ? '' : ' · ${r.note}'}'
+                          ' · ${accountName(r.accountId)}'),
+                      trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+                        Text('${isExpense ? '-' : '+'}${formatCents(r.amountCents)}',
+                            style: TextStyle(
+                                color: isExpense ? AppTheme.expenseColor : AppTheme.incomeColor,
+                                fontWeight: FontWeight.w600)),
+                        IconButton(
+                            icon: const Icon(Icons.delete_outline),
+                            onPressed: () => deleteFlow(r)),
+                      ]),
+                    ),
+                  ),
                 );
               },
             ),

@@ -148,16 +148,22 @@ class _CategoryList extends StatelessWidget {
       itemCount: cats.length,
       itemBuilder: (_, i) {
         final c = cats[i];
-        return ListTile(
-          leading: CircleAvatar(child: Icon(categoryIcons[c.icon] ?? Icons.face)),
-          title: Text(c.name),
-          subtitle: c.isBuiltin ? const Text('内置分类') : null,
-          onTap: onTapCategory == null ? null : () => onTapCategory!(c),
-          trailing: c.isBuiltin
-              ? null
-              : IconButton(
-                  icon: const Icon(Icons.delete_outline),
-                  onPressed: () => onDelete(c)),
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+          child: Card(
+            margin: EdgeInsets.zero,
+            child: ListTile(
+              leading: CircleAvatar(child: Icon(categoryIcons[c.icon] ?? Icons.face)),
+              title: Text(c.name),
+              subtitle: c.isBuiltin ? const Text('内置分类') : null,
+              onTap: onTapCategory == null ? null : () => onTapCategory!(c),
+              trailing: c.isBuiltin
+                  ? null
+                  : IconButton(
+                      icon: const Icon(Icons.delete_outline),
+                      onPressed: () => onDelete(c)),
+            ),
+          ),
         );
       },
     );

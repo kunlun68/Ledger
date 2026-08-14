@@ -76,18 +76,24 @@ class AccountsScreen extends ConsumerWidget {
               itemBuilder: (_, i) {
                 final a = accounts[i];
                 final balance = balances[a.id] ?? 0;
-                return ListTile(
-                  leading: const CircleAvatar(child: Icon(Icons.account_balance_wallet_outlined)),
-                  title: Text(a.name),
-                  trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-                    Text(formatCents(balance),
-                        style: TextStyle(
-                            color: balance >= 0 ? AppTheme.incomeColor : AppTheme.expenseColor,
-                            fontWeight: FontWeight.w600)),
-                    IconButton(
-                        icon: const Icon(Icons.delete_outline),
-                        onPressed: () => deleteFlow(a)),
-                  ]),
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                  child: Card(
+                    margin: EdgeInsets.zero,
+                    child: ListTile(
+                      leading: const CircleAvatar(child: Icon(Icons.account_balance_wallet_outlined)),
+                      title: Text(a.name),
+                      trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+                        Text(formatCents(balance),
+                            style: TextStyle(
+                                color: balance >= 0 ? AppTheme.incomeColor : AppTheme.expenseColor,
+                                fontWeight: FontWeight.w600)),
+                        IconButton(
+                            icon: const Icon(Icons.delete_outline),
+                            onPressed: () => deleteFlow(a)),
+                      ]),
+                    ),
+                  ),
                 );
               },
             ),

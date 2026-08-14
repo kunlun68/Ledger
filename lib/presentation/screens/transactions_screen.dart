@@ -65,40 +65,51 @@ class TransactionsScreen extends ConsumerWidget {
                             fontSize: 12)),
                   ),
                   for (final tx in entry.value)
-                    Dismissible(
-                      key: ValueKey(tx.id),
-                      direction: DismissDirection.endToStart,
-                      background: Container(
-                          color: AppTheme.expenseColor,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                      child: Dismissible(
+                        key: ValueKey(tx.id),
+                        direction: DismissDirection.endToStart,
+                        background: Container(
+                          decoration: BoxDecoration(
+                            color: AppTheme.expenseColor,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                           alignment: Alignment.centerRight,
                           padding: const EdgeInsets.only(right: 20),
-                          child: const Icon(Icons.delete, color: Colors.white)),
-                      onDismissed: (_) => delete(tx),
-                      child: ListTile(
-                        leading: tx.type == TxType.transfer
-                            ? const CircleAvatar(child: Icon(Icons.swap_horiz))
-                            : CircleAvatar(child: Text(catName(tx.categoryId).characters.first)),
-                        title: Text(tx.type == TxType.transfer
-                            ? '${accountName(tx.accountId)} → ${accountName(tx.transferAccountId ?? 0)}'
-                            : catName(tx.categoryId)),
-                        subtitle: Text(tx.type == TxType.transfer
-                            ? (tx.note.isEmpty ? '转账' : tx.note)
-                            : '${accountName(tx.accountId)}${tx.note.isEmpty ? '' : ' · ${tx.note}'}'),
-                        trailing: Text(
-                          '${tx.type == TxType.expense ? '-' : tx.type == TxType.income ? '+' : ''}${formatCents(tx.amountCents)}',
-                          style: TextStyle(
-                              color: tx.type == TxType.expense
-                                  ? AppTheme.expenseColor
-                                  : tx.type == TxType.income
-                                      ? AppTheme.incomeColor
-                                      : null,
-                              fontWeight: FontWeight.w600),
+                          child: const Icon(Icons.delete, color: Colors.white),
                         ),
-                        // 转账记录不可编辑（记一笔表单只支持支出/收入）
-                        onTap: tx.type == TxType.transfer
-                            ? null
-                            : () => Navigator.push(context, MaterialPageRoute(
-                                builder: (_) => AddTransactionScreen(initial: tx))),
+                        onDismissed: (_) => delete(tx),
+                        child: Card(
+                          margin: EdgeInsets.zero,
+                          child: ListTile(
+                            leading: tx.type == TxType.transfer
+                                ? const CircleAvatar(child: Icon(Icons.swap_horiz))
+                                : CircleAvatar(
+                                    child: Text(catName(tx.categoryId).characters.first)),
+                            title: Text(tx.type == TxType.transfer
+                                ? '${accountName(tx.accountId)} → ${accountName(tx.transferAccountId ?? 0)}'
+                                : catName(tx.categoryId)),
+                            subtitle: Text(tx.type == TxType.transfer
+                                ? (tx.note.isEmpty ? '转账' : tx.note)
+                                : '${accountName(tx.accountId)}${tx.note.isEmpty ? '' : ' · ${tx.note}'}'),
+                            trailing: Text(
+                              '${tx.type == TxType.expense ? '-' : tx.type == TxType.income ? '+' : ''}${formatCents(tx.amountCents)}',
+                              style: TextStyle(
+                                  color: tx.type == TxType.expense
+                                      ? AppTheme.expenseColor
+                                      : tx.type == TxType.income
+                                          ? AppTheme.incomeColor
+                                          : null,
+                                  fontWeight: FontWeight.w600),
+                            ),
+                            // 转账记录不可编辑（记一笔表单只支持支出/收入）
+                            onTap: tx.type == TxType.transfer
+                                ? null
+                                : () => Navigator.push(context, MaterialPageRoute(
+                                    builder: (_) => AddTransactionScreen(initial: tx))),
+                          ),
+                        ),
                       ),
                     ),
                 ],
