@@ -17,7 +17,12 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-        onCreate: (m) async => m.createAll(),
+        onCreate: (m) async {
+          await m.createAll();
+          // 全新安装与 v3→v4 升级一致：种默认"现金"账户
+          await into(accounts).insert(AccountsCompanion.insert(
+              name: '现金', icon: 'payments', sortOrder: const Value(0)));
+        },
         onUpgrade: (m, from, to) async {
           if (from < 2) {
             await m.addColumn(categories, categories.monthlyBudgetCents);
