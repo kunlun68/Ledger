@@ -167,42 +167,64 @@ class _SummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = Theme.of(context).colorScheme;
-    return Card(
-      margin: const EdgeInsets.all(12),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Text(
-              '结余',
-              style: TextStyle(color: c.onSurfaceVariant, fontSize: 13),
-            ),
-            Text(
-              formatCents(summary.balanceCents),
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: summary.balanceCents >= 0
-                    ? AppTheme.incomeColor
-                    : AppTheme.expenseColor,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text(
-                  '收入 ${formatCents(summary.incomeCents)}',
-                  style: const TextStyle(color: AppTheme.incomeColor),
-                ),
-                Text(
-                  '支出 ${formatCents(summary.expenseCents)}',
-                  style: const TextStyle(color: AppTheme.expenseColor),
-                ),
-              ],
-            ),
-          ],
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [c.primary, c.primaryContainer],
         ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Stack(children: [
+          // 装饰圆：右上角与左下角半透明白圆，增加层次
+          Positioned(
+            right: -30,
+            top: -40,
+            child: Container(
+                width: 120, height: 120,
+                decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withValues(alpha: 0.12))),
+          ),
+          Positioned(
+            left: -20,
+            bottom: -50,
+            child: Container(
+                width: 100, height: 100,
+                decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withValues(alpha: 0.08))),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(children: [
+              const Text('结余',
+                  style: TextStyle(color: Colors.white70, fontSize: 13)),
+              Text(
+                formatCents(summary.balanceCents),
+                style: const TextStyle(
+                  fontSize: 34,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text('收入 ${formatCents(summary.incomeCents)}',
+                      style: const TextStyle(color: Colors.white70)),
+                  Text('支出 ${formatCents(summary.expenseCents)}',
+                      style: const TextStyle(color: Colors.white70)),
+                ],
+              ),
+            ]),
+          ),
+        ]),
       ),
     );
   }
@@ -224,19 +246,25 @@ class _TransactionTile extends StatelessWidget {
     final isExpense = tx.type == TxType.expense;
     final color = isExpense ? AppTheme.expenseColor : AppTheme.incomeColor;
     final sign = isExpense ? '-' : '+';
-    return ListTile(
-      leading: CircleAvatar(child: Text(categoryName.characters.first)),
-      title: Text(categoryName),
-      subtitle: Text(tx.note.isEmpty ? ' ' : tx.note),
-      trailing: Text(
-        '$sign${formatCents(tx.amountCents)}',
-        style: TextStyle(
-          color: color,
-          fontWeight: FontWeight.w600,
-          fontSize: 16,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+      child: Card(
+        margin: EdgeInsets.zero,
+        child: ListTile(
+          leading: CircleAvatar(child: Text(categoryName.characters.first)),
+          title: Text(categoryName),
+          subtitle: Text(tx.note.isEmpty ? ' ' : tx.note),
+          trailing: Text(
+            '$sign${formatCents(tx.amountCents)}',
+            style: TextStyle(
+              color: color,
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
+            ),
+          ),
+          onTap: onTap,
         ),
       ),
-      onTap: onTap,
     );
   }
 }
