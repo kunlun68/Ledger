@@ -9,6 +9,7 @@ import '../data/dao/transactions_dao.dart';
 import '../data/database.dart';
 import '../data/transaction_type.dart';
 import 'backup_io.dart';
+import 'background_io.dart';
 
 /// 在 main() 中 override 为真实数据库
 final databaseProvider = Provider<AppDatabase>((ref) => throw UnimplementedError());
@@ -67,3 +68,9 @@ final totalAssetsProvider = Provider<int>((ref) {
   final txs = ref.watch(allTransactionsProvider).value ?? const <Transaction>[];
   return totalAssets(txs);
 });
+
+final settingsStoreProvider = Provider<SettingsStore>((ref) => PrefsSettingsStore());
+final backgroundImageIOProvider =
+    Provider<BackgroundImageIO>((ref) => AppDirBackgroundImageIO());
+/// 相册选图入口（返回图片绝对路径或 null）；测试 override 注入 fake。
+final imagePickerProvider = Provider<Future<String?> Function()>((ref) => pickImageFile);
