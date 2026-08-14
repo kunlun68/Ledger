@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../application/providers.dart';
+import '../../core/budget.dart';
 import '../../core/date_util.dart';
 import '../../core/money.dart';
 import '../../core/stats.dart';
@@ -30,6 +31,7 @@ class StatisticsScreen extends ConsumerWidget {
 
     String catName(int id) =>
         cats.where((c) => c.id == id).map((c) => c.name).firstOrNull ?? '未分类';
+    final budgetOf = <int, int>{for (final c in cats) c.id: c.monthlyBudgetCents};
 
     final ranking = byCategory.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
@@ -95,19 +97,57 @@ class StatisticsScreen extends ConsumerWidget {
                   padding: EdgeInsets.all(16),
                   child: Text('暂无数据'))
               : Column(children: [
-                  for (final e in ranking)
-                    ListTile(
-                      dense: true,
-                      leading: CircleAvatar(
-                          backgroundColor: pieColors[ranking.indexOf(e) % pieColors.length],
-                          child: Text(catName(e.key).characters.first,
-                              style: const TextStyle(color: Colors.white, fontSize: 12))),
-                      title: Text(catName(e.key)),
-                      trailing: Text(formatCents(e.value),
-                          style: const TextStyle(fontWeight: FontWeight.w600)),
-                    ),
+                  for (var i = 0; i < ranking.length; i++)
+                    _RankingTile(
+                        entry: ranking[i],
+                        colorIndex: i,
+                        budgetCents: budgetOf[ranking[i].key] ?? 0,
+                        categoryName: catName(ranking[i].key)),
                 ])),
         ],
+      ),
+    );
+  }
+}
+
+class _RankingTile extends StatelessWidget {
+  const _RankingTile(
+      {required this.entry,
+      required this.colorIndex,
+      required this.budgetCents,
+      required this.categoryName});
+
+  final MapEntry<int, int> entry;
+  final int colorIndex;
+  final int budgetCents;
+  final String categoryName;
+
+  @override
+  Widget build(BuildContext context) {
+    final over = isOverBudget(entry.value, budgetCents);
+    final color = over ? AppTheme.expenseColor : null;
+    return ListTile(
+      dense: true,
+      leading: CircleAvatar(
+          backgroundColor: pieColors[colorIndex % pieColors.length],
+          child: Text(categoryName.characters.first,
+              style: const TextStyle(color: Colors.white, fontSize: 12))),
+      title: Text(categoryName),
+      subtitle: budgetCents > 0
+          ? Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: LinearProgressIndicator(
+                  value: budgetProgress(entry.value, budgetCents),
+                  color: color,
+                  backgroundColor:
+                      Theme.of(context).colorScheme.surfaceContainerHighest),
+            )
+          : null,
+      trailing: Text(
+        budgetCents > 0
+            ? '已花 ${formatCents(entry.value)} / ${formatCents(budgetCents)}'
+            : formatCents(entry.value),
+        style: TextStyle(fontWeight: FontWeight.w600, color: color),
       ),
     );
   }

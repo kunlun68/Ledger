@@ -8,6 +8,7 @@ import 'package:ledger/data/dao/transactions_dao.dart';
 import 'package:ledger/data/database.dart';
 import 'package:ledger/data/transaction_type.dart';
 import 'package:ledger/presentation/screens/statistics_screen.dart';
+import 'package:ledger/presentation/theme/app_theme.dart';
 
 void main() {
   late AppDatabase db;
@@ -53,6 +54,30 @@ void main() {
     addTearDown(emptyDb.close);
     await pump(tester, emptyDb);
     expect(find.text('本月暂无支出记录'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump(Duration.zero);
+  });
+
+  testWidgets('shows budget progress and over-budget red', (tester) async {
+    // cats[0]=1000 分支出，设预算 1500（未超）；cats[1]=2000 分，设预算 1000（超支）
+    final dao = CategoriesDao(db);
+    final cats = await dao.getByType(TxType.expense);
+    await dao.updateBudget(cats[0].id, 1500);
+    await dao.updateBudget(cats[1].id, 1000);
+    await pump(tester, db);
+    expect(find.text('已花 10.00 / 15.00'), findsOneWidget);
+    final over = tester.widget<Text>(find.text('已花 20.00 / 10.00'));
+    expect(over.style?.color, AppTheme.expenseColor);
+    expect(find.byType(LinearProgressIndicator), findsNWidgets(2));
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump(Duration.zero);
+  });
+
+  testWidgets('categories without budget keep plain amount', (tester) async {
+    await pump(tester, db);
+    expect(find.text('20.00'), findsOneWidget); // 排行金额原样
+    expect(find.byType(LinearProgressIndicator), findsNothing);
+    expect(find.textContaining('已花'), findsNothing);
     await tester.pumpWidget(const SizedBox());
     await tester.pump(Duration.zero);
   });
