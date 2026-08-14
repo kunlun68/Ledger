@@ -84,6 +84,17 @@ class $CategoriesTable extends Categories
     ),
     defaultValue: const Constant(false),
   );
+  static const VerificationMeta _monthlyBudgetCentsMeta =
+      const VerificationMeta('monthlyBudgetCents');
+  @override
+  late final GeneratedColumn<int> monthlyBudgetCents = GeneratedColumn<int>(
+    'monthly_budget_cents',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -92,6 +103,7 @@ class $CategoriesTable extends Categories
     type,
     sortOrder,
     isBuiltin,
+    monthlyBudgetCents,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -136,6 +148,15 @@ class $CategoriesTable extends Categories
         isBuiltin.isAcceptableOrUnknown(data['is_builtin']!, _isBuiltinMeta),
       );
     }
+    if (data.containsKey('monthly_budget_cents')) {
+      context.handle(
+        _monthlyBudgetCentsMeta,
+        monthlyBudgetCents.isAcceptableOrUnknown(
+          data['monthly_budget_cents']!,
+          _monthlyBudgetCentsMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -171,6 +192,10 @@ class $CategoriesTable extends Categories
         DriftSqlType.bool,
         data['${effectivePrefix}is_builtin'],
       )!,
+      monthlyBudgetCents: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}monthly_budget_cents'],
+      )!,
     );
   }
 
@@ -190,6 +215,9 @@ class Category extends DataClass implements Insertable<Category> {
   final TxType type;
   final int sortOrder;
   final bool isBuiltin;
+
+  /// 每月预算（分），0 = 无预算
+  final int monthlyBudgetCents;
   const Category({
     required this.id,
     required this.name,
@@ -197,6 +225,7 @@ class Category extends DataClass implements Insertable<Category> {
     required this.type,
     required this.sortOrder,
     required this.isBuiltin,
+    required this.monthlyBudgetCents,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -211,6 +240,7 @@ class Category extends DataClass implements Insertable<Category> {
     }
     map['sort_order'] = Variable<int>(sortOrder);
     map['is_builtin'] = Variable<bool>(isBuiltin);
+    map['monthly_budget_cents'] = Variable<int>(monthlyBudgetCents);
     return map;
   }
 
@@ -222,6 +252,7 @@ class Category extends DataClass implements Insertable<Category> {
       type: Value(type),
       sortOrder: Value(sortOrder),
       isBuiltin: Value(isBuiltin),
+      monthlyBudgetCents: Value(monthlyBudgetCents),
     );
   }
 
@@ -239,6 +270,7 @@ class Category extends DataClass implements Insertable<Category> {
       ),
       sortOrder: serializer.fromJson<int>(json['sortOrder']),
       isBuiltin: serializer.fromJson<bool>(json['isBuiltin']),
+      monthlyBudgetCents: serializer.fromJson<int>(json['monthlyBudgetCents']),
     );
   }
   @override
@@ -253,6 +285,7 @@ class Category extends DataClass implements Insertable<Category> {
       ),
       'sortOrder': serializer.toJson<int>(sortOrder),
       'isBuiltin': serializer.toJson<bool>(isBuiltin),
+      'monthlyBudgetCents': serializer.toJson<int>(monthlyBudgetCents),
     };
   }
 
@@ -263,6 +296,7 @@ class Category extends DataClass implements Insertable<Category> {
     TxType? type,
     int? sortOrder,
     bool? isBuiltin,
+    int? monthlyBudgetCents,
   }) => Category(
     id: id ?? this.id,
     name: name ?? this.name,
@@ -270,6 +304,7 @@ class Category extends DataClass implements Insertable<Category> {
     type: type ?? this.type,
     sortOrder: sortOrder ?? this.sortOrder,
     isBuiltin: isBuiltin ?? this.isBuiltin,
+    monthlyBudgetCents: monthlyBudgetCents ?? this.monthlyBudgetCents,
   );
   Category copyWithCompanion(CategoriesCompanion data) {
     return Category(
@@ -279,6 +314,9 @@ class Category extends DataClass implements Insertable<Category> {
       type: data.type.present ? data.type.value : this.type,
       sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
       isBuiltin: data.isBuiltin.present ? data.isBuiltin.value : this.isBuiltin,
+      monthlyBudgetCents: data.monthlyBudgetCents.present
+          ? data.monthlyBudgetCents.value
+          : this.monthlyBudgetCents,
     );
   }
 
@@ -290,13 +328,22 @@ class Category extends DataClass implements Insertable<Category> {
           ..write('icon: $icon, ')
           ..write('type: $type, ')
           ..write('sortOrder: $sortOrder, ')
-          ..write('isBuiltin: $isBuiltin')
+          ..write('isBuiltin: $isBuiltin, ')
+          ..write('monthlyBudgetCents: $monthlyBudgetCents')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name, icon, type, sortOrder, isBuiltin);
+  int get hashCode => Object.hash(
+    id,
+    name,
+    icon,
+    type,
+    sortOrder,
+    isBuiltin,
+    monthlyBudgetCents,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -306,7 +353,8 @@ class Category extends DataClass implements Insertable<Category> {
           other.icon == this.icon &&
           other.type == this.type &&
           other.sortOrder == this.sortOrder &&
-          other.isBuiltin == this.isBuiltin);
+          other.isBuiltin == this.isBuiltin &&
+          other.monthlyBudgetCents == this.monthlyBudgetCents);
 }
 
 class CategoriesCompanion extends UpdateCompanion<Category> {
@@ -316,6 +364,7 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
   final Value<TxType> type;
   final Value<int> sortOrder;
   final Value<bool> isBuiltin;
+  final Value<int> monthlyBudgetCents;
   const CategoriesCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
@@ -323,6 +372,7 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
     this.type = const Value.absent(),
     this.sortOrder = const Value.absent(),
     this.isBuiltin = const Value.absent(),
+    this.monthlyBudgetCents = const Value.absent(),
   });
   CategoriesCompanion.insert({
     this.id = const Value.absent(),
@@ -331,6 +381,7 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
     required TxType type,
     this.sortOrder = const Value.absent(),
     this.isBuiltin = const Value.absent(),
+    this.monthlyBudgetCents = const Value.absent(),
   }) : name = Value(name),
        icon = Value(icon),
        type = Value(type);
@@ -341,6 +392,7 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
     Expression<String>? type,
     Expression<int>? sortOrder,
     Expression<bool>? isBuiltin,
+    Expression<int>? monthlyBudgetCents,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -349,6 +401,8 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
       if (type != null) 'type': type,
       if (sortOrder != null) 'sort_order': sortOrder,
       if (isBuiltin != null) 'is_builtin': isBuiltin,
+      if (monthlyBudgetCents != null)
+        'monthly_budget_cents': monthlyBudgetCents,
     });
   }
 
@@ -359,6 +413,7 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
     Value<TxType>? type,
     Value<int>? sortOrder,
     Value<bool>? isBuiltin,
+    Value<int>? monthlyBudgetCents,
   }) {
     return CategoriesCompanion(
       id: id ?? this.id,
@@ -367,6 +422,7 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
       type: type ?? this.type,
       sortOrder: sortOrder ?? this.sortOrder,
       isBuiltin: isBuiltin ?? this.isBuiltin,
+      monthlyBudgetCents: monthlyBudgetCents ?? this.monthlyBudgetCents,
     );
   }
 
@@ -393,6 +449,9 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
     if (isBuiltin.present) {
       map['is_builtin'] = Variable<bool>(isBuiltin.value);
     }
+    if (monthlyBudgetCents.present) {
+      map['monthly_budget_cents'] = Variable<int>(monthlyBudgetCents.value);
+    }
     return map;
   }
 
@@ -404,7 +463,8 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
           ..write('icon: $icon, ')
           ..write('type: $type, ')
           ..write('sortOrder: $sortOrder, ')
-          ..write('isBuiltin: $isBuiltin')
+          ..write('isBuiltin: $isBuiltin, ')
+          ..write('monthlyBudgetCents: $monthlyBudgetCents')
           ..write(')'))
         .toString();
   }
@@ -940,6 +1000,7 @@ typedef $$CategoriesTableCreateCompanionBuilder =
       required TxType type,
       Value<int> sortOrder,
       Value<bool> isBuiltin,
+      Value<int> monthlyBudgetCents,
     });
 typedef $$CategoriesTableUpdateCompanionBuilder =
     CategoriesCompanion Function({
@@ -949,6 +1010,7 @@ typedef $$CategoriesTableUpdateCompanionBuilder =
       Value<TxType> type,
       Value<int> sortOrder,
       Value<bool> isBuiltin,
+      Value<int> monthlyBudgetCents,
     });
 
 final class $$CategoriesTableReferences
@@ -1011,6 +1073,11 @@ class $$CategoriesTableFilterComposer
 
   ColumnFilters<bool> get isBuiltin => $composableBuilder(
     column: $table.isBuiltin,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get monthlyBudgetCents => $composableBuilder(
+    column: $table.monthlyBudgetCents,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1078,6 +1145,11 @@ class $$CategoriesTableOrderingComposer
     column: $table.isBuiltin,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<int> get monthlyBudgetCents => $composableBuilder(
+    column: $table.monthlyBudgetCents,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$CategoriesTableAnnotationComposer
@@ -1106,6 +1178,11 @@ class $$CategoriesTableAnnotationComposer
 
   GeneratedColumn<bool> get isBuiltin =>
       $composableBuilder(column: $table.isBuiltin, builder: (column) => column);
+
+  GeneratedColumn<int> get monthlyBudgetCents => $composableBuilder(
+    column: $table.monthlyBudgetCents,
+    builder: (column) => column,
+  );
 
   Expression<T> transactionsRefs<T extends Object>(
     Expression<T> Function($$TransactionsTableAnnotationComposer a) f,
@@ -1167,6 +1244,7 @@ class $$CategoriesTableTableManager
                 Value<TxType> type = const Value.absent(),
                 Value<int> sortOrder = const Value.absent(),
                 Value<bool> isBuiltin = const Value.absent(),
+                Value<int> monthlyBudgetCents = const Value.absent(),
               }) => CategoriesCompanion(
                 id: id,
                 name: name,
@@ -1174,6 +1252,7 @@ class $$CategoriesTableTableManager
                 type: type,
                 sortOrder: sortOrder,
                 isBuiltin: isBuiltin,
+                monthlyBudgetCents: monthlyBudgetCents,
               ),
           createCompanionCallback:
               ({
@@ -1183,6 +1262,7 @@ class $$CategoriesTableTableManager
                 required TxType type,
                 Value<int> sortOrder = const Value.absent(),
                 Value<bool> isBuiltin = const Value.absent(),
+                Value<int> monthlyBudgetCents = const Value.absent(),
               }) => CategoriesCompanion.insert(
                 id: id,
                 name: name,
@@ -1190,6 +1270,7 @@ class $$CategoriesTableTableManager
                 type: type,
                 sortOrder: sortOrder,
                 isBuiltin: isBuiltin,
+                monthlyBudgetCents: monthlyBudgetCents,
               ),
           withReferenceMapper: (p0) => p0
               .map(

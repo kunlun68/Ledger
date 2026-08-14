@@ -8,6 +8,8 @@ class Categories extends Table {
   TextColumn get type => textEnum<TxType>()();
   IntColumn get sortOrder => integer().withDefault(const Constant(0))();
   BoolColumn get isBuiltin => boolean().withDefault(const Constant(false))();
+  /// 每月预算（分），0 = 无预算
+  IntColumn get monthlyBudgetCents => integer().withDefault(const Constant(0))();
 }
 
 class Transactions extends Table {
