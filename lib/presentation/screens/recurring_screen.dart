@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../application/providers.dart';
 import '../../core/date_util.dart';
 import '../../core/money.dart';
+import '../../core/recurring.dart' show ruleStartYyyymm;
 import '../../data/database.dart';
 import '../../data/transaction_type.dart';
 import '../theme/app_theme.dart';
@@ -136,7 +137,9 @@ class RecurringScreen extends ConsumerWidget {
                         dayOfMonth: day,
                         note: noteCtrl.text.trim(),
                         accountId: accountId,
-                        lastGeneratedYyyymm: yyyymmOf(todayYyyymmdd()));
+                        // 规则日已过则补生成当月，否则下月生效
+                        lastGeneratedYyyymm:
+                            ruleStartYyyymm(day, todayYyyymmdd()));
                     if (ctx.mounted) Navigator.pop(ctx);
                   },
                   child: const Text('保存'),
