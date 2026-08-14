@@ -34,6 +34,23 @@ class TransactionsDao {
             updatedAt: DateTime.now(),
           ));
 
+  /// 转账：单条双向记录（type=transfer, account=转出, transferAccount=转入, category=null）。
+  Future<void> insertTransfer(
+          {required int fromAccountId,
+          required int toAccountId,
+          required int amountCents,
+          required int date,
+          String note = ''}) =>
+      db.into(db.transactions).insert(TransactionsCompanion.insert(
+            type: TxType.transfer,
+            amountCents: amountCents,
+            categoryId: const Value(null),
+            accountId: Value(fromAccountId),
+            transferAccountId: Value(toAccountId),
+            date: date,
+            note: Value(note),
+          ));
+
   Future<void> deleteTransaction(int id) =>
       (db.delete(db.transactions)..where((t) => t.id.equals(id))).go();
 
