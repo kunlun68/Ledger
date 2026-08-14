@@ -47,6 +47,12 @@
 - **JSON 完整备份/恢复**：换机、重装不丢数据（通过系统分享面板发送备份文件）
 - **CSV 流水导出**：Excel/记事本可直接打开，中文不乱码（UTF-8 BOM）
 
+### 个性化与美化
+
+- **自定义背景**：内置 8 色底色 + 相册图片，全局生效（全部页面统一背景）
+- **图片透明度调节**：Slider 实时预览，不透明度 0-100%（默认 60%），带黑色 scrim 保证文字可读
+- **页面美化**：首页渐变头卡、列表卡片化、统一圆角与透明 AppBar
+
 ## 技术栈
 
 | 层 | 技术 |
@@ -79,7 +85,7 @@ flutter build apk --release
 # 产物：build/app/outputs/flutter-apk/app-release.apk
 ```
 
-> 注：测试套件（101 个用例）在本机维护、未随仓库分发；gradle.properties 中 `kotlin.incremental=false` 为 Windows 构建兼容设置，勿删。
+> 注：测试套件（128 个用例）在本机维护、未随仓库分发；gradle.properties 中 `kotlin.incremental=false` 为 Windows 构建兼容设置，勿删。
 
 ## 目录结构
 
