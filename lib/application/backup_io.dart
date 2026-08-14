@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:file_picker/file_picker.dart';
+import 'package:file_selector/file_selector.dart';
 import 'package:share_plus/share_plus.dart';
 
 /// 平台通道抽象：widget 测试注入 fake，避免测试环境平台通道不可用。
@@ -18,10 +18,11 @@ class SharePlusBackupIO implements BackupIO {
 
   @override
   Future<String?> pickBackupFile() async {
-    final result = await FilePicker.platform
-        .pickFiles(type: FileType.custom, allowedExtensions: ['json']);
-    final path = result?.files.single.path;
-    if (path == null) return null;
-    return File(path).readAsString();
+    // file_selector 走系统 SAF，取消选择返回 null
+    final file = await openFile(acceptedTypeGroups: [
+      const XTypeGroup(label: 'json', extensions: ['json']),
+    ]);
+    if (file == null) return null;
+    return File(file.path).readAsString();
   }
 }

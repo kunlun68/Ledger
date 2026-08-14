@@ -36,6 +36,10 @@ migrate_working_dir/
 # Local tool config (may contain permissions/tokens)
 /.claude/
 
+# Process docs and tests stay local (not published to repo)
+/docs/superpowers/
+/test/
+
 # Symbolication related
 app.*.symbols
 
@@ -43,6 +47,7 @@ app.*.symbols
 app.*.map.json
 
 # Android Studio will place build artifacts here
+/android/build/
 /android/app/debug
 /android/app/profile
 /android/app/release
