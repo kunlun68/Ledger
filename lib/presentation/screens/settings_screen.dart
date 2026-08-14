@@ -6,6 +6,7 @@ import '../../core/backup.dart';
 import '../../core/csv_export.dart';
 import '../../core/date_util.dart';
 import 'accounts_screen.dart';
+import 'background_screen.dart';
 import 'recurring_screen.dart';
 import '../widgets/app_scaffold.dart';
 
@@ -109,6 +110,12 @@ class SettingsScreen extends ConsumerWidget {
             subtitle: const Text('现金/微信/银行卡等多账户与转账'),
             onTap: () => Navigator.push(context,
                 MaterialPageRoute(builder: (_) => const AccountsScreen()))),
+        ListTile(
+            leading: const Icon(Icons.palette_outlined),
+            title: const Text('自定义背景'),
+            subtitle: const Text('底色 / 图片 / 不透明度'),
+            onTap: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const BackgroundScreen()))),
         const Divider(),
         const Padding(
           padding: EdgeInsets.all(16),
