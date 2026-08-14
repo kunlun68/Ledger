@@ -5,6 +5,7 @@ import '../../application/providers.dart';
 import '../../core/backup.dart';
 import '../../core/csv_export.dart';
 import '../../core/date_util.dart';
+import 'accounts_screen.dart';
 import 'recurring_screen.dart';
 
 /// 设置页：导出 CSV / 备份 / 恢复。
@@ -100,6 +101,12 @@ class SettingsScreen extends ConsumerWidget {
             subtitle: const Text('房租/订阅等每月自动入账'),
             onTap: () => Navigator.push(context,
                 MaterialPageRoute(builder: (_) => const RecurringScreen()))),
+        ListTile(
+            leading: const Icon(Icons.account_balance_wallet_outlined),
+            title: const Text('账户'),
+            subtitle: const Text('现金/微信/银行卡等多账户与转账'),
+            onTap: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const AccountsScreen()))),
         const Divider(),
         const Padding(
           padding: EdgeInsets.all(16),
