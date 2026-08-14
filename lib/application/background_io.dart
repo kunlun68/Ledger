@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:file_selector/file_selector.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../core/background_settings.dart';
@@ -40,7 +40,7 @@ class InMemorySettingsStore implements SettingsStore {
 
 /// 背景图片文件 IO 抽象：测试注入 fake。
 abstract class BackgroundImageIO {
-  /// 把 [sourcePath]（file_selector 临时文件）拷贝到应用私有目录，
+  /// 把 [sourcePath]（image_picker 缓存文件）拷贝到应用私有目录，
   /// 返回新文件绝对路径。失败抛异常。
   Future<String> saveImage(String sourcePath);
   Future<void> deleteImage(String path);
@@ -74,10 +74,8 @@ class FakeBackgroundImageIO implements BackgroundImageIO {
   Future<void> deleteImage(String path) async => deleted.add(path);
 }
 
-/// 系统文件选择器挑图片；取消返回 null。
+/// 相册选择图片（Android 13+ 系统 Photo Picker，低版本自动回退）；取消返回 null。
 Future<String?> pickImageFile() async {
-  final file = await openFile(acceptedTypeGroups: [
-    const XTypeGroup(label: 'image', extensions: ['jpg', 'jpeg', 'png', 'webp']),
-  ]);
+  final file = await ImagePicker().pickImage(source: ImageSource.gallery);
   return file?.path;
 }
