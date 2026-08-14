@@ -5,6 +5,7 @@ import '../../application/providers.dart';
 import '../../core/backup.dart';
 import '../../core/csv_export.dart';
 import '../../core/date_util.dart';
+import 'recurring_screen.dart';
 
 /// 设置页：导出 CSV / 备份 / 恢复。
 class SettingsScreen extends ConsumerWidget {
@@ -93,6 +94,12 @@ class SettingsScreen extends ConsumerWidget {
             title: const Text('恢复'),
             subtitle: const Text('从备份文件恢复，将清空现有数据'),
             onTap: restore),
+        ListTile(
+            leading: const Icon(Icons.event_repeat),
+            title: const Text('周期记账'),
+            subtitle: const Text('房租/订阅等每月自动入账'),
+            onTap: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const RecurringScreen()))),
         const Divider(),
         const Padding(
           padding: EdgeInsets.all(16),

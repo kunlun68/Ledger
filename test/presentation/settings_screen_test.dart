@@ -11,6 +11,7 @@ import 'package:ledger/data/dao/categories_dao.dart';
 import 'package:ledger/data/dao/transactions_dao.dart';
 import 'package:ledger/data/database.dart';
 import 'package:ledger/data/transaction_type.dart';
+import 'package:ledger/presentation/screens/recurring_screen.dart';
 import 'package:ledger/presentation/screens/settings_screen.dart';
 
 class FakeBackupIO implements BackupIO {
@@ -139,6 +140,15 @@ void main() {
     await tester.tap(find.text('恢复'));
     await tester.pumpAndSettle();
     expect(find.text('不是本应用的备份文件'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump(Duration.zero);
+  });
+
+  testWidgets('recurring entry opens recurring screen', (tester) async {
+    await pump(tester);
+    await tester.tap(find.text('周期记账'));
+    await tester.pumpAndSettle();
+    expect(find.byType(RecurringScreen), findsOneWidget);
     await tester.pumpWidget(const SizedBox());
     await tester.pump(Duration.zero);
   });
