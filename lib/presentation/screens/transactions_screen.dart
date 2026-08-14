@@ -8,9 +8,9 @@ import '../theme/app_theme.dart';
 import 'add_transaction_screen.dart';
 
 /// 账单列表：按月内分组（日期间隔标题），滑动删除 + 撤销，点击进编辑。
+/// 显示月份由 [currentMonthProvider] 决定（与首页共享）。
 class TransactionsScreen extends ConsumerWidget {
-  const TransactionsScreen({super.key, required this.initialMonth, required this.onExit});
-  final int initialMonth;
+  const TransactionsScreen({super.key, required this.onExit});
   final VoidCallback onExit;
 
   @override

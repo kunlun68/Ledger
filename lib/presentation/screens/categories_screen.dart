@@ -6,67 +6,80 @@ import '../../data/database.dart';
 import '../../data/transaction_type.dart';
 import '../widgets/category_picker.dart' show categoryIcons;
 
-/// 分类管理：支出/收入两个 Tab；新增自定义分类；内置分类不可删除；
-/// 被记录使用的分类删除时提示。
-class CategoriesScreen extends ConsumerWidget {
+/// 分类管理：支出/收入两个 Tab；新增分类跟随当前 Tab 类型；
+/// 内置分类不可删除；被记录使用的分类删除时提示。
+class CategoriesScreen extends ConsumerStatefulWidget {
   const CategoriesScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final cats = ref.watch(allCategoriesProvider).value ?? const <Category>[];
+  ConsumerState<CategoriesScreen> createState() => _CategoriesScreenState();
+}
+
+class _CategoriesScreenState extends ConsumerState<CategoriesScreen>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tab = TabController(length: 2, vsync: this);
+
+  @override
+  void dispose() {
+    _tab.dispose();
+    super.dispose();
+  }
+
+  Future<void> addDialog() async {
+    final nameCtrl = TextEditingController();
+    final type = _tab.index == 0 ? TxType.expense : TxType.income;
     final dao = ref.read(categoriesDaoProvider);
-
-    Future<void> addDialog() async {
-      final nameCtrl = TextEditingController();
-      final type = TxType.expense; // 简化：默认支出，Tab 切换影响新增类型可后续增强
-      await showDialog<void>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('新增分类'),
-          content: TextField(controller: nameCtrl, decoration: const InputDecoration(hintText: '分类名称')),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('取消')),
-            TextButton(
-              onPressed: () async {
-                final name = nameCtrl.text.trim();
-                if (name.isEmpty) return;
-                await dao.insertCategory(name, 'face', type);
-                if (ctx.mounted) Navigator.pop(ctx);
-              },
-              child: const Text('确定'),
-            ),
-          ],
-        ),
-      );
-    }
-
-    Future<void> deleteFlow(Category c) async {
-      try {
-        await dao.deleteCategory(c);
-      } on CategoryInUseException {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(const SnackBar(content: Text('该分类已被记录使用，无法删除')));
-        }
-      }
-    }
-
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('分类管理'),
-          bottom: const TabBar(tabs: [Tab(text: '支出'), Tab(text: '收入')]),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: addDialog, child: const Icon(Icons.add)),
-        body: TabBarView(children: [
-          _CategoryList(cats: cats.where((c) => c.type == TxType.expense).toList(),
-              onDelete: deleteFlow),
-          _CategoryList(cats: cats.where((c) => c.type == TxType.income).toList(),
-              onDelete: deleteFlow),
-        ]),
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('新增分类'),
+        content: TextField(controller: nameCtrl, decoration: const InputDecoration(hintText: '分类名称')),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('取消')),
+          TextButton(
+            onPressed: () async {
+              final name = nameCtrl.text.trim();
+              if (name.isEmpty) return;
+              await dao.insertCategory(name, 'face', type);
+              if (ctx.mounted) Navigator.pop(ctx);
+            },
+            child: const Text('确定'),
+          ),
+        ],
       ),
+    );
+  }
+
+  Future<void> deleteFlow(Category c) async {
+    try {
+      await ref.read(categoriesDaoProvider).deleteCategory(c);
+    } on CategoryInUseException {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('该分类已被记录使用，无法删除')));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final cats = ref.watch(allCategoriesProvider).value ?? const <Category>[];
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('分类管理'),
+        bottom: TabBar(
+            controller: _tab,
+            tabs: const [Tab(text: '支出'), Tab(text: '收入')]),
+      ),
+      floatingActionButton: FloatingActionButton(
+          onPressed: addDialog, child: const Icon(Icons.add)),
+      body: TabBarView(controller: _tab, children: [
+        _CategoryList(
+            cats: cats.where((c) => c.type == TxType.expense).toList(),
+            onDelete: deleteFlow),
+        _CategoryList(
+            cats: cats.where((c) => c.type == TxType.income).toList(),
+            onDelete: deleteFlow),
+      ]),
     );
   }
 }

@@ -104,7 +104,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             onTap: () async {
               final picked = await showDatePicker(
                 context: context,
-                initialDate: DateTime.now(),
+                // 编辑旧记录时从记录日期开始，而非今天
+                initialDate: DateTime(_date ~/ 10000, (_date ~/ 100) % 100, _date % 100),
                 firstDate: DateTime(2000),
                 lastDate: DateTime(2100),
               );

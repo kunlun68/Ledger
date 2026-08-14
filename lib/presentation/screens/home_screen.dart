@@ -77,7 +77,7 @@ class HomeScreen extends ConsumerWidget {
               context,
               MaterialPageRoute(
                   builder: (_) =>
-                      TransactionsScreen(initialMonth: month, onExit: () => Navigator.pop(context))),
+                      TransactionsScreen(onExit: () => Navigator.pop(context))),
             ),
             icon: const Icon(Icons.list),
             label: const Text('查看全部'),

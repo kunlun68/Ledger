@@ -23,17 +23,18 @@ void main() {
   tearDown(() => db.close());
 
   Future<void> pump(WidgetTester tester) async {
+    // 显式固定月份，避免依赖"今天是几月"导致跨月红
+    final container = ProviderContainer(overrides: [
+      databaseProvider.overrideWithValue(db),
+    ]);
+    container.read(currentMonthProvider.notifier).state = 202608;
+    addTearDown(container.dispose);
     tester.view.physicalSize = const Size(800, 1600);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
-    await tester.pumpWidget(ProviderScope(
-      overrides: [databaseProvider.overrideWithValue(db)],
-      child: MaterialApp(
-        home: TransactionsScreen(
-          initialMonth: 202608,
-          onExit: () {},
-        ),
-      ),
+    await tester.pumpWidget(UncontrolledProviderScope(
+      container: container,
+      child: MaterialApp(home: TransactionsScreen(onExit: () {})),
     ));
     await tester.pumpAndSettle();
   }

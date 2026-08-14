@@ -5,6 +5,7 @@ import 'package:drift/native.dart';
 import 'package:ledger/application/providers.dart';
 import 'package:ledger/data/dao/categories_dao.dart';
 import 'package:ledger/data/database.dart';
+import 'package:ledger/data/transaction_type.dart';
 import 'package:ledger/presentation/screens/categories_screen.dart';
 
 void main() {
@@ -53,6 +54,22 @@ void main() {
     await tester.tap(find.text('餐饮'));
     await tester.pumpAndSettle();
     expect(find.text('内置分类不可删除'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump(Duration.zero);
+  });
+
+  testWidgets('adds category to the active tab type', (tester) async {
+    await pump(tester);
+    await tester.tap(find.text('收入'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(FloatingActionButton));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), '奖金');
+    await tester.tap(find.text('确定'));
+    await tester.pumpAndSettle();
+    expect(find.text('奖金'), findsOneWidget); // 出现在当前收入 Tab
+    final incomeCats = await CategoriesDao(db).getByType(TxType.income);
+    expect(incomeCats.any((c) => c.name == '奖金'), isTrue);
     await tester.pumpWidget(const SizedBox());
     await tester.pump(Duration.zero);
   });

@@ -16,9 +16,9 @@ const pieColors = <Color>[
 ];
 
 /// 统计页：本月分类占比饼图 + 近 6 个月收支柱状图 + 支出分类排行。
+/// 显示月份由 [currentMonthProvider] 决定（与首页共享）。
 class StatisticsScreen extends ConsumerWidget {
-  const StatisticsScreen({super.key, this.initialMonth});
-  final int? initialMonth;
+  const StatisticsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
